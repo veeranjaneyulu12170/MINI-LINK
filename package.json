@@ -1,16 +1,15 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "minilink",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
-    "dev": "concurrently -k \"npm run server\" \"npm run client\"",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "client": "vite",
     "server": "nodemon --exec ts-node --project backend/tsconfig.json backend/src/index.ts",
-    "build": "tsc && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@splinetool/react-spline": "^4.0.0",

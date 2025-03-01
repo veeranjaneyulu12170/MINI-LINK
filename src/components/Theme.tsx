@@ -12,30 +12,67 @@ import { useAppearance } from '../context/AppearanceContext';
 
 // Define valid theme options
 type ThemeOption = {
-  name: string;
-  // add other properties
+  name: 'default' | 'dark' | 'light' | 'gradient' | 'minimal' | 'colorful';
+  classes: string;
 };
 
 type ButtonOption = {
-  name: string;
-  // add other properties
+  name: 'rounded' | 'square' | 'pill' | 'shadow' | 'outline' | '3d';
+  classes: string;
 };
 
 type ProfileOption = {
-  name: string;
-  // add other properties
+  name: 'circle' | 'square' | 'rounded';
+  classes: string;
 };
 
 type BannerOption = {
-  name: string;
-  // add other properties
+  name: 'full' | 'rounded' | 'none';
+  classes: string;
 };
 
 type FontOption = {
-  name: string;
+  name: 'modern' | 'classic' | 'playful';
   class: string;
-  // add other properties
 };
+
+// Update the mapped arrays with proper typing
+const themeOptions: Array<{ name: ThemeOption['name']; icon: JSX.Element }> = [
+  { name: 'default', icon: <div className="h-6 w-6 rounded-full bg-white border border-gray-300"></div> },
+  { name: 'dark', icon: <div className="h-6 w-6 rounded-full bg-gray-900 border border-gray-700"></div> },
+  { name: 'light', icon: <div className="h-6 w-6 rounded-full bg-blue-50 border border-blue-200"></div> },
+  { name: 'gradient', icon: <div className="h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600"></div> },
+  { name: 'minimal', icon: <div className="h-6 w-6 rounded-full bg-gray-50 border border-gray-200"></div> },
+  { name: 'colorful', icon: <div className="h-6 w-6 rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500"></div> }
+] as const;
+
+const buttonOptions: Array<{ name: ButtonOption['name']; preview: JSX.Element }> = [
+  { name: 'rounded', preview: <div className="h-6 w-12 bg-indigo-500 rounded-lg"></div> },
+  { name: 'square', preview: <div className="h-6 w-12 bg-indigo-500 rounded-none"></div> },
+  { name: 'pill', preview: <div className="h-6 w-12 bg-indigo-500 rounded-full"></div> },
+  { name: 'shadow', preview: <div className="h-6 w-12 bg-indigo-500 rounded-lg shadow-lg"></div> },
+  { name: 'outline', preview: <div className="h-6 w-12 bg-transparent border-2 border-indigo-500"></div> },
+  { name: '3d', preview: <div className="h-6 w-12 bg-indigo-500 rounded-lg transform shadow-md"></div> }
+] as const;
+
+// Add proper type definitions for the option arrays
+const profileOptions: Array<{ name: ProfileOption['name']; preview: JSX.Element }> = [
+  { name: 'circle', preview: <div className="h-10 w-10 bg-blue-200 rounded-full flex items-center justify-center"><UserIcon className="h-6 w-6" /></div> },
+  { name: 'square', preview: <div className="h-10 w-10 bg-blue-200 rounded-none flex items-center justify-center"><UserIcon className="h-6 w-6" /></div> },
+  { name: 'rounded', preview: <div className="h-10 w-10 bg-blue-200 rounded-lg flex items-center justify-center"><UserIcon className="h-6 w-6" /></div> }
+] as const;
+
+const bannerOptions: Array<{ name: BannerOption['name']; preview: JSX.Element }> = [
+  { name: 'full', preview: <div className="h-4 w-20 bg-gray-300 rounded-none"></div> },
+  { name: 'rounded', preview: <div className="h-4 w-20 bg-gray-300 rounded-lg"></div> },
+  { name: 'none', preview: <div className="h-4 w-20 bg-transparent border border-gray-300"></div> }
+] as const;
+
+const fontOptions: Array<{ name: FontOption['name']; class: string }> = [
+  { name: 'modern', class: 'font-sans' },
+  { name: 'classic', class: 'font-serif' },
+  { name: 'playful', class: 'font-mono' }
+] as const;
 
 const Theme: React.FC = () => {
   const {
@@ -48,11 +85,11 @@ const Theme: React.FC = () => {
   } = useAppearance();
   
   // Theme States with proper typing
-  const [selectedTheme, setSelectedTheme] = useState<ThemeOption['name']>('light');
-  const [buttonStyle, setButtonStyle] = useState<ButtonOption['name']>('default');
-  const [profileStyle, setProfileStyle] = useState<ProfileOption['name']>('default');
-  const [bannerStyle, setBannerStyle] = useState<BannerOption['name']>('default');
-  const [fontStyle, setFontStyle] = useState<FontOption['class']>('default');
+  const [selectedTheme, setSelectedTheme] = useState<ThemeOption['name']>('default');
+  const [buttonStyle, setButtonStyle] = useState<ButtonOption['name']>('rounded');
+  const [profileStyle, setProfileStyle] = useState<ProfileOption['name']>('circle');
+  const [bannerStyle, setBannerStyle] = useState<BannerOption['name']>('full');
+  const [fontStyle, setFontStyle] = useState<FontOption['name']>('modern');
 
   // CSS classes based on selections
   const [themeClasses, setThemeClasses] = useState("");
@@ -64,41 +101,41 @@ const Theme: React.FC = () => {
   // Update theme classes when selections change
   useEffect(() => {
     // Theme colors with type assertion
-    const themeMap = {
+    const themeMap: Record<ThemeOption['name'], string> = {
       default: "bg-white border-indigo-500",
       dark: "bg-gray-900 border-gray-700 text-white",
       light: "bg-blue-50 border-blue-200",
       gradient: "bg-gradient-to-br from-indigo-500 to-purple-600 border-purple-500 text-white",
       minimal: "bg-white border-gray-200",
       colorful: "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 border-orange-400 text-white"
-    } as const;
+    };
     
-    const buttonMap = {
+    const buttonMap: Record<ButtonOption['name'], string> = {
       rounded: "rounded-lg bg-indigo-500 text-white",
       square: "rounded-none bg-indigo-500 text-white",
       pill: "rounded-full bg-indigo-500 text-white",
       shadow: "rounded-lg bg-indigo-500 text-white shadow-lg shadow-indigo-200",
       outline: "rounded-lg bg-transparent border-2 border-indigo-500 text-indigo-500",
       "3d": "rounded-lg bg-indigo-500 text-white transform hover:-translate-y-1 transition-transform shadow-md"
-    } as const;
+    };
     
-    const profileMap = {
+    const profileMap: Record<ProfileOption['name'], string> = {
       circle: "rounded-full",
       square: "rounded-none",
       rounded: "rounded-lg"
-    } as const;
+    };
     
-    const bannerMap = {
+    const bannerMap: Record<BannerOption['name'], string> = {
       full: "rounded-none",
       rounded: "rounded-lg",
       none: "hidden"
-    } as const;
+    };
     
-    const fontMap = {
+    const fontMap: Record<FontOption['name'], string> = {
       modern: "font-sans",
       classic: "font-serif",
       playful: "font-mono"
-    } as const;
+    };
 
     setThemeClasses(themeMap[selectedTheme]);
     setButtonClasses(buttonMap[buttonStyle]);
@@ -251,14 +288,7 @@ const Theme: React.FC = () => {
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Color Theme</h3>
             <div className="grid grid-cols-3 gap-4">
-              {[
-                { name: 'default', icon: <div className="h-6 w-6 rounded-full bg-white border border-gray-300"></div> },
-                { name: 'dark', icon: <div className="h-6 w-6 rounded-full bg-gray-900 border border-gray-700"></div> },
-                { name: 'light', icon: <div className="h-6 w-6 rounded-full bg-blue-50 border border-blue-200"></div> },
-                { name: 'gradient', icon: <div className="h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600"></div> },
-                { name: 'minimal', icon: <div className="h-6 w-6 rounded-full bg-gray-50 border border-gray-200"></div> },
-                { name: 'colorful', icon: <div className="h-6 w-6 rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500"></div> }
-              ].map((theme) => (
+              {themeOptions.map((theme) => (
                 <button
                   key={theme.name}
                   onClick={() => setSelectedTheme(theme.name)}
@@ -277,14 +307,7 @@ const Theme: React.FC = () => {
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Button Style</h3>
             <div className="grid grid-cols-3 gap-4">
-              {[
-                { name: 'rounded', preview: <div className="h-6 w-12 bg-indigo-500 rounded-lg"></div> },
-                { name: 'square', preview: <div className="h-6 w-12 bg-indigo-500 rounded-none"></div> },
-                { name: 'pill', preview: <div className="h-6 w-12 bg-indigo-500 rounded-full"></div> },
-                { name: 'shadow', preview: <div className="h-6 w-12 bg-indigo-500 rounded-lg shadow-lg"></div> },
-                { name: 'outline', preview: <div className="h-6 w-12 bg-transparent border-2 border-indigo-500"></div> },
-                { name: '3d', preview: <div className="h-6 w-12 bg-indigo-500 rounded-lg transform shadow-md"></div> }
-              ].map((style) => (
+              {buttonOptions.map((style) => (
                 <button
                   key={style.name}
                   onClick={() => setButtonStyle(style.name)}
@@ -303,11 +326,7 @@ const Theme: React.FC = () => {
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Profile Picture Style</h3>
             <div className="grid grid-cols-3 gap-4">
-              {[
-                { name: 'circle', preview: <div className="h-10 w-10 bg-blue-200 rounded-full flex items-center justify-center"><UserIcon className="h-6 w-6" /></div> },
-                { name: 'square', preview: <div className="h-10 w-10 bg-blue-200 rounded-none flex items-center justify-center"><UserIcon className="h-6 w-6" /></div> },
-                { name: 'rounded', preview: <div className="h-10 w-10 bg-blue-200 rounded-lg flex items-center justify-center"><UserIcon className="h-6 w-6" /></div> }
-              ].map((style) => (
+              {profileOptions.map((style) => (
                 <button
                   key={style.name}
                   onClick={() => setProfileStyle(style.name)}
@@ -326,11 +345,7 @@ const Theme: React.FC = () => {
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Banner Style</h3>
             <div className="grid grid-cols-3 gap-4">
-              {[
-                { name: 'full', preview: <div className="h-4 w-20 bg-gray-300 rounded-none"></div> },
-                { name: 'rounded', preview: <div className="h-4 w-20 bg-gray-300 rounded-lg"></div> },
-                { name: 'none', preview: <div className="h-4 w-20 bg-transparent border border-gray-300"></div> }
-              ].map((style) => (
+              {bannerOptions.map((style) => (
                 <button
                   key={style.name}
                   onClick={() => setBannerStyle(style.name)}
@@ -349,16 +364,12 @@ const Theme: React.FC = () => {
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Font Style</h3>
             <div className="grid grid-cols-3 gap-4">
-              {[
-                { name: 'modern', class: 'font-sans' },
-                { name: 'classic', class: 'font-serif' },
-                { name: 'playful', class: 'font-mono' }
-              ].map((style) => (
+              {fontOptions.map((style) => (
                 <button
                   key={style.name}
-                  onClick={() => setFontStyle(style.class)}
+                  onClick={() => setFontStyle(style.name)}
                   className={`p-4 rounded-lg border-2 flex flex-col items-center ${
-                    fontStyle === style.class ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'
+                    fontStyle === style.name ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'
                   }`}
                 >
                   <Type className="h-6 w-6 mb-2" />
