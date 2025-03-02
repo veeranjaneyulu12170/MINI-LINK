@@ -6,7 +6,7 @@
     "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
     "frontend": "vite",
     "backend": "cd backend && npm run dev",
-    "build": "tsc && vite build",
+    "build": "CI=false tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint ."
   },
