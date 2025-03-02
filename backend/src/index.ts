@@ -10,14 +10,11 @@ import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: [
-    'https://your-frontend-domain.vercel.app',
-    'http://localhost:3000'
-  ],
+  origin: ['http://localhost:3000', 'https://your-frontend-domain.vercel.app'],
   credentials: true
 }));
 app.use(express.json());
@@ -26,20 +23,31 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/links', linkRoutes);
 
-// Connect to MongoDB
+// MongoDB Connection with better error handling
 mongoose.connect(process.env.MONGODB_URI!)
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('✅ Connected to MongoDB successfully');
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('MongoDB connection error:', error);
+    console.error('❌ MongoDB connection error:', error);
+    process.exit(1);
   });
+
+// Basic error handling
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err);
   process.exit(1);
 });
+
+console.log('Starting server...');
+console.log('Environment:', process.env.NODE_ENV);
+console.log('MongoDB URI:', process.env.MONGODB_URI?.substring(0, 20) + '...');
