@@ -1,11 +1,10 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = 'http://localhost:5000/api'; // Adjust this to match your backend URL
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL,
-  withCredentials: true,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -40,9 +39,6 @@ export const auth = {
   login: async (email: string, password: string) => {
     try {
       const response = await api.post('/auth/login', { email, password });
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
       return response;
     } catch (error) {
       console.error('Login error:', error);
@@ -52,32 +48,13 @@ export const auth = {
   register: async (name: string, email: string, password: string) => {
     try {
       const response = await api.post('/auth/register', { name, email, password });
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
       return response;
     } catch (error) {
       console.error('Register error:', error);
       throw error;
     }
   },
-  logout: () => {
-    localStorage.removeItem('token');
-  }
 };
-
-// Add response interceptor to handle 401 errors
-api.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
 
 export const links = {
   create: (linkData: {
