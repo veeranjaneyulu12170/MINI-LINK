@@ -22,6 +22,9 @@ const MainApp: React.FC<MainAppProps> = ({ user, setUser }) => {
   const [activeTab, setActiveTab] = useState('links');
   const [linksList, setLinksList] = useState<Link[]>([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  console.log("Links List being passed to LinkList:", linksList);
+
 
   useEffect(() => {
     // Check if user is authenticated
@@ -30,9 +33,11 @@ const MainApp: React.FC<MainAppProps> = ({ user, setUser }) => {
       navigate('/login');
       return;
     }
-
+  },[navigate, user]);
+  
+  useEffect(() => {
     // Fetch links
-    const fetchLinks = async () => {
+    const fetchData = async () => {
       try {
         const response = await links.getAll();
         setLinksList(response.data);
@@ -41,11 +46,13 @@ const MainApp: React.FC<MainAppProps> = ({ user, setUser }) => {
         if (axios.isAxiosError(err) && err.response?.status === 401) {
           navigate('/login');
         }
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchLinks();
-  }, [navigate]);
+    fetchData();
+  }, []);
 
   const addLink = async (linkData: {
     title: string;
@@ -55,7 +62,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, setUser }) => {
   }) => {
     try {
       const response = await links.create(linkData);
-      setLinksList([response.data, ...linksList]);
+      setLinksList(prevLinks => [response.data, ...prevLinks]);
     } catch (err) {
       console.error('Failed to create link:', err);
     }
@@ -66,7 +73,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, setUser }) => {
       // First update the UI optimistically
       setLinksList(prevLinks => 
         prevLinks.map(link => 
-          link.id === id 
+          link._id === id 
             ? { ...link, clicks: Number(link.clicks || 0) + 1 }
             : link
         )
@@ -87,32 +94,51 @@ const MainApp: React.FC<MainAppProps> = ({ user, setUser }) => {
   };
 
   const deleteLink = async (id: string) => {
+    if (!id) {
+      console.error("Invalid link ID:", id);
+      return;
+    }
+  
     try {
+      console.log("Deleting link with ID:", id); // Debugging
       await links.delete(id);
-      setLinksList(prevLinks => prevLinks.filter(link => link.id !== id));
+      setLinksList(prevLinks => prevLinks.filter(link => link._id !== id));
     } catch (err) {
-      console.error('Failed to delete link:', err);
+      console.error("Failed to delete link:", err);
     }
   };
+  
 
-  const deleteAllLinks = async () => {
-    try {
-      await Promise.all(linksList.map(link => links.delete(link.id)));
-      setLinksList([]);
-    } catch (err) {
-      console.error('Failed to delete all links:', err);
-    }
-  };
+const deleteAllLinks = async () => {
+  if (!linksList.length) return; // Prevent unnecessary API call
+
+  const confirmDelete = window.confirm("Are you sure you want to delete all links?");
+  if (!confirmDelete) return;
+
+  try {
+    await Promise.all(linksList.map(link => links.delete(link._id)));
+    setLinksList([]);
+  } catch (err) {
+    console.error("Failed to delete all links:", err);
+  }
+};
+
 
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser);
   };
 
   const handleLogout = () => {
-    auth.logout(); // This will remove the token
+    auth.logout();
     setUser(null);
-    navigate('/login');
+    navigate('/', { replace: true });
   };
+
+  if (loading) {
+    return <div className="flex-1 p-8 h-screen ml-64 flex items-center justify-center">
+      Loading...
+    </div>;
+  }
 
   return (
     <AppearanceProvider>
@@ -123,7 +149,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, setUser }) => {
           links={linksList}
           onLogout={handleLogout}
         />
-        <div className="flex-1 p-8 h-screen ml-64 ">
+        <div className="flex-1 p-8 h-screen ml-64">
           <div className="space-y-6">
             {activeTab === 'links' && (
               <div className="space-y-6">

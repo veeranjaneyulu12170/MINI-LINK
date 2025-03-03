@@ -37,18 +37,26 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    
+    setLoading(true);
+  
     try {
       const response = await auth.login(email, password);
-      if (response.data.user) {
+      if (response.data.user && response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user)); // ✅ Store user data
         setUser(response.data.user);
-        // Token is automatically saved by the auth service
-        navigate('/dashboard');
+        navigate('/app', { replace: true });
+      } else {
+        setError("Login failed. Please try again.");
       }
     } catch (err) {
       setError("Invalid email or password");
+    } finally {
+      setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="h-screen w-screen fixed inset-0 flex items-center justify-center overflow-hidden">

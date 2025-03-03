@@ -54,6 +54,10 @@ export const auth = {
       throw error;
     }
   },
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
 };
 
 export const links = {

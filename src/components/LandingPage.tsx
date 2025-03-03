@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Foter from './Foter';
 import { 
@@ -25,6 +25,20 @@ import {
 } from 'react-icons/fa';
 
 const LandingPage: React.FC = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check for saved section
+    const lastSection = localStorage.getItem('lastSection');
+    if (lastSection) {
+      const element = document.getElementById(lastSection);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+      localStorage.removeItem('lastSection'); // Clear after use
+    }
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* Navigation */}

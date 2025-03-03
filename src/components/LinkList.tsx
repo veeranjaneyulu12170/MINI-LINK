@@ -17,6 +17,7 @@ const LinkList: React.FC<LinkListProps> = ({ links: linksList, updateLinks, dele
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  console.log("Links received in LinkList:", linksList);
 
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
@@ -35,7 +36,7 @@ const LinkList: React.FC<LinkListProps> = ({ links: linksList, updateLinks, dele
 
     // Save new order to backend
     try {
-      await links.reorder(updatedItems.map(item => item.id));
+      await links.reorder(updatedItems.map(item => item._id));
     } catch (err) {
       console.error('Failed to update link order:', err);
       setErrorMessage('Failed to update link order. Please try again.');
@@ -44,12 +45,21 @@ const LinkList: React.FC<LinkListProps> = ({ links: linksList, updateLinks, dele
   };
 
   const handleDelete = async (id: string) => {
+    if (!id) {
+      console.error("Invalid link ID:", id);
+      return;
+    }
+  
     try {
+      console.log("Deleting link with ID:", id);
       setIsDeleting(id);
-      await deleteLink(id);
-      // Filter out the deleted link locally as fallback
-      const updatedLinks = linksList.filter(link => link.id !== id);
+      
+      await deleteLink(id);  // API call
+  
+      // Ensure only the correct link is removed
+      const updatedLinks = linksList.filter(link => link._id !== id);
       updateLinks(updatedLinks);
+  
       setErrorMessage(null);
     } catch (error) {
       console.error('Error deleting link:', error);
@@ -59,6 +69,8 @@ const LinkList: React.FC<LinkListProps> = ({ links: linksList, updateLinks, dele
       setIsDeleting(null);
     }
   };
+  
+
 
   const handleDeleteAll = async () => {
     try {
@@ -156,7 +168,7 @@ const LinkList: React.FC<LinkListProps> = ({ links: linksList, updateLinks, dele
               className="space-y-3"
             >
               {linksList.map((link, index) => (
-                <Draggable key={link.id} draggableId={link.id} index={index}>
+                <Draggable key={link._id} draggableId={link._id} index={index}>
                   {(provided: DraggableProvided) => (
                     <div
                       ref={provided.innerRef}
@@ -180,7 +192,7 @@ const LinkList: React.FC<LinkListProps> = ({ links: linksList, updateLinks, dele
                         rel="noopener noreferrer"
                         className="flex-grow"
                         style={{ color: link.textColor || '#000000' }}
-                        onClick={() => incrementClicks(link.id)}
+                        onClick={() => incrementClicks(link._id)}
                       >
                         <h3 className="font-medium">{link.title}</h3>
                         <p className="text-sm opacity-75 truncate">{link.url}</p>
@@ -190,17 +202,22 @@ const LinkList: React.FC<LinkListProps> = ({ links: linksList, updateLinks, dele
                         <span className="text-sm text-gray-500">
                           {link.clicks} clicks
                         </span>
-                        <button
-                          onClick={() => handleDelete(link.id)}
-                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                          disabled={isDeleting === link.id}
-                        >
-                          {isDeleting === link.id ? (
-                            <Loader size={18} className="animate-spin" />
-                          ) : (
-                            <Trash2 size={18} />
-                          )}
-                        </button>
+                      
+<button
+onClick={() => {
+  console.log("Link object before deletion:", link);  // ✅ Debugging step
+  handleDelete(link._id);
+}}
+className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+disabled={isDeleting === link._id}
+>
+{isDeleting === link._id ? (
+  <Loader size={18} className="animate-spin" />
+) : (
+  <Trash2 size={18} />
+)}
+</button>
+
                       </div>
                     </div>
                   )}

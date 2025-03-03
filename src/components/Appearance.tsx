@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   MoreHorizontal,
   Trash2,
@@ -52,48 +52,67 @@ const Appearance: React.FC<AppearanceProps> = ({ user, updateUser }) => {
     { name: "Website", icon: <Globe />, placeholder: "Enter Website URL", prefix: "" }
   ];
   
-  const [socialLinks, setSocialLinks] = useState<{ name: string; url: string; color: string; shape: string; textColor: string }[]>([]);
-const [activePlatform, setActivePlatform] = useState<string | null>(null);
-const [currentUrl, setCurrentUrl] = useState("");
-const [currentCustomization, setCurrentCustomization] = useState({
-  color: "bg-blue-500",
-  shape: "rounded-lg",
-  textColor: "text-white"
-});
-
-
-// Handle Enter Key to Add Link
-const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, platform: string, prefix: string) => {
-  if (event.key === "Enter") {
-    if (!currentUrl.startsWith(prefix)) {
-      alert(`Invalid URL! Please enter a valid ${platform} link.`);
-      return;
+  const [socialLinks, setSocialLinks] = useState<{
+    name: string;
+    url: string;
+    color: string;
+    shape: string;
+    textColor: string;
+  }[]>(() => {
+    try {
+      const saved = localStorage.getItem('userSocialLinks');
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.error('Error loading social links:', error);
+      return [];
     }
+  });
 
-    // Save link with customization
-    setSocialLinks([
-      ...socialLinks,
-      { name: platform, url: currentUrl, ...currentCustomization }
-    ]);
-    
-    // Reset input & customization settings after adding the link
-    setCurrentUrl("");
-    setActivePlatform(null);
-    setCurrentCustomization({ color: "bg-blue-500", shape: "rounded-lg", textColor: "text-white" });
-  }
-};
+  // Save social links to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('userSocialLinks', JSON.stringify(socialLinks));
+    } catch (error) {
+      console.error('Error saving social links:', error);
+    }
+  }, [socialLinks]);
 
+  const [activePlatform, setActivePlatform] = useState<string | null>(null);
+  const [currentUrl, setCurrentUrl] = useState("");
+  const [currentCustomization, setCurrentCustomization] = useState({
+    color: "bg-blue-500",
+    shape: "rounded-lg",
+    textColor: "text-white"
+  });
 
+  // Handle Enter Key to Add Link
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, platform: string, prefix: string) => {
+    if (event.key === "Enter") {
+      if (!currentUrl.startsWith(prefix)) {
+        alert(`Invalid URL! Please enter a valid ${platform} link.`);
+        return;
+      }
 
-// Update Link Customization
-const updateLinkStyle = (index: number, key: string, value: string) => {
-  const updatedLinks = [...socialLinks];
-  (updatedLinks[index] as any)[key] = value;
-  setSocialLinks(updatedLinks);
-};
+      // Save link with customization
+      setSocialLinks([
+        ...socialLinks,
+        { name: platform, url: currentUrl, ...currentCustomization }
+      ]);
+      
+      // Reset input & customization settings after adding the link
+      setCurrentUrl("");
+      setActivePlatform(null);
+      setCurrentCustomization({ color: "bg-blue-500", shape: "rounded-lg", textColor: "text-white" });
+    }
+  };
 
-  
-  
+  // Update Link Customization
+  const updateLinkStyle = (index: number, key: string, value: string) => {
+    const updatedLinks = [...socialLinks];
+    (updatedLinks[index] as any)[key] = value;
+    setSocialLinks(updatedLinks);
+  };
+
   const [showEditModal, setShowEditModal] = useState(false);
   const [showNameBioModal, setShowNameBioModal] = useState(false);
 
