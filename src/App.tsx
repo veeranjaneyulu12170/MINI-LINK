@@ -6,6 +6,7 @@ import Login from './components/Login';
 import LandingPage from './components/LandingPage';
 import MainApp from './components/MainApp';
 import MainNavbar from './components/MainNavbar';
+import { useLocation } from 'react-router-dom';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -31,11 +32,15 @@ function App() {
     setUser(null);
   };
 
-  return (
-    <Router>
+  // Create a wrapper component to use useLocation
+  const AppContent = () => {
+    const location = useLocation();
+    const isLoginPage = location.pathname === '/login';
+
+    return (
       <div className="min-h-screen bg-gray-50">
-        <MainNavbar user={user} onLogout={handleLogout} />
-        <div className="pt-16">
+        {!isLoginPage && <MainNavbar user={user} onLogout={handleLogout} />}
+        <div className={isLoginPage ? '' : 'pt-16'}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={
@@ -47,6 +52,12 @@ function App() {
           </Routes>
         </div>
       </div>
+    );
+  };
+
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

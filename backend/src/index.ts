@@ -25,6 +25,15 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/links', linkRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Backend is running successfully! 🚀");
+});
+
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // MongoDB Connection with better error handling
 mongoose.connect(process.env.MONGODB_URI!)
   .then(() => {

@@ -72,7 +72,7 @@ const LandingPage: React.FC = () => {
         />
 
         {/* Content on top of iframe */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-white text-center px-4">
+        <div id="home" className="relative z-10 flex flex-col items-center justify-center h-full text-white text-center px-4">
           <div className="absolute bottom-6 right-6 md:bottom-5 md:right-5 
                      w-[90%] max-w-[400px] h-auto min-h-[40px] 
                      bg-black " ></div>
