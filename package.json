@@ -3,10 +3,10 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
+    "dev": "vite",
     "frontend": "vite",
     "backend": "cd backend && npm run dev",
-    "build": "CI=false tsc && vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint ."
   },
