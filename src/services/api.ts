@@ -1,16 +1,14 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api'; // Adjust this to match your backend URL
-
-// Create axios instance with base URL
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true
 });
 
-// Add auth token to requests
+// Add request interceptor to include token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -19,18 +17,15 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Add response interceptor for debugging
+// Add response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => {
-    console.log('API Response:', response);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('API Error:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-    });
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
     return Promise.reject(error);
   }
 );
