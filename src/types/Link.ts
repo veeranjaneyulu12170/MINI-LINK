@@ -1,9 +1,10 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 import { customAlphabet } from 'nanoid';
 
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 10);
 
-export interface ILink {
+export interface ILink extends Document {
+  id: string;
   shortId: string;
   url: string;
   title?: string;
@@ -53,3 +54,5 @@ const linkSchema = new Schema<ILink>({
 const Link = model<ILink>('Link', linkSchema);
 
 export default Link;
+
+export type { ILink };
