@@ -82,7 +82,7 @@ const Analytics: React.FC<AnalyticsProps> = ({ links }) => {
           <div className="space-y-4">
             {stats.topLinks.map((link, index) => (
               <div 
-                key={link.id}
+                key={link._id}
                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
               >
                 <div className="flex-1">

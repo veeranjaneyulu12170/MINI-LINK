@@ -84,7 +84,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink }) => {
   const handleDelete = async (id: string) => {
     try {
       await deleteLink(id);
-      setAddedLinks(addedLinks.filter(link => link.id !== id));
+      setAddedLinks(addedLinks.filter(link => link._id !== id));
     } catch (err) {
       setError("Error deleting link. Please try again.");
     }
@@ -157,7 +157,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink }) => {
           <div className="space-y-3">
             {addedLinks.map((link) => (
               <div
-                key={link.id}
+                key={link._id}
                 className="flex items-center justify-between p-3 border rounded-lg"
                 style={{
                   backgroundColor: link.backgroundColor || '#ffffff',
@@ -169,7 +169,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink }) => {
                   <p className="text-sm opacity-75">{link.url}</p>
                 </div>
                 <button
-                  onClick={() => handleDelete(link.id)}
+                  onClick={() => handleDelete(link._id)}
                   className="text-red-500 hover:text-red-700 p-2"
                 >
                   Delete
