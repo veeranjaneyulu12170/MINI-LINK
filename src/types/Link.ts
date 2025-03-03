@@ -55,4 +55,4 @@ const Link = model<ILink>('Link', linkSchema);
 
 export default Link;
 
-export type { ILink };
+export type { Link };
