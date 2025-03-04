@@ -17,9 +17,13 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ user, onLogout }) => {
   const handleNavigation = (sectionId: string) => {
     if (isLandingPage) {
       // If on landing page, scroll to section
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      if (sectionId === 'top') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     } else {
       // If not on landing page, navigate to landing page with section
@@ -30,7 +34,7 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ user, onLogout }) => {
   };
 
   return (
-    <nav className="bg-white/30 ml-2 mr-2 backdrop-blur-md shadow-sm fixed w-full rounded-lg top-2 z-50">
+    <nav className="bg-white/30 ml-2 mr-2 backdrop-blur-md shadow-sm fixed w-full rounded-2xl top-2 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -52,12 +56,12 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ user, onLogout }) => {
 
           {/* Desktop navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/" 
+            <button 
+              onClick={() => handleNavigation('top')} 
               className={`text-gray-700 hover:text-indigo-600 ${location.pathname === '/' ? 'text-indigo-600' : ''}`}
             >
               Home
-            </Link>
+            </button>
 
             {/* Navigation Links */}
             <button 
@@ -118,13 +122,12 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ user, onLogout }) => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4 px-2 pb-3">
-              <Link 
-                to="/" 
-                className={`text-gray-700 hover:text-indigo-600 ${location.pathname === '/' ? 'text-indigo-600' : ''}`}
-                onClick={() => setIsMenuOpen(false)}
+              <button 
+                onClick={() => handleNavigation('top')} 
+                className={`text-left text-gray-700 hover:text-indigo-600 ${location.pathname === '/' ? 'text-indigo-600' : ''}`}
               >
                 Home
-              </Link>
+              </button>
               <button 
                 onClick={() => handleNavigation('features')} 
                 className="text-left text-gray-700 hover:text-indigo-600"
