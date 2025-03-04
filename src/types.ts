@@ -13,5 +13,8 @@ export interface User {
   id: string;
   email: string;
   name?: string;
+  bio?: string;  // Add bio (optional)
+  avatarUrl?: string;  // Add avatarUrl if missing
+  createdAt: string;  // Make createdAt required, not optional
   // Add any other user properties you need
 }

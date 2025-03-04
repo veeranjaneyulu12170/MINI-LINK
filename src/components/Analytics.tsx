@@ -8,33 +8,20 @@ interface AnalyticsProps {
 
 const Analytics: React.FC<AnalyticsProps> = ({ links }) => {
   const stats = useMemo(() => {
-    // Calculate total clicks
-    const totalClicks = links.reduce((total, link) => {
-      const clicks = typeof link.clicks === 'number' ? link.clicks : 0;
-      return total + clicks;
-    }, 0);
-
-    // Calculate average clicks (rounded to 1 decimal place)
-    const averageClicks = links.length > 0 
-      ? Math.round((totalClicks / links.length) * 10) / 10
-      : 0;
-
-    // Sort links by clicks
-    const sortedLinks = [...links].sort((a, b) => {
-      const clicksA = typeof a.clicks === 'number' ? a.clicks : 0;
-      const clicksB = typeof b.clicks === 'number' ? b.clicks : 0;
-      return clicksB - clicksA;
-    });
-
-    // Get top 5 performing links
+    console.log("Analytics recalculating...", links);
+    
+    if (!links || links.length === 0) return { totalClicks: 0, averageClicks: 0, topLinks: [] };
+  
+    const totalClicks = links.reduce((total, link) => total + (link.clicks || 0), 0);
+    const averageClicks = links.length > 0 ? (totalClicks / links.length).toFixed(1) : 0;
+  
+    const sortedLinks = [...links].sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
     const topLinks = sortedLinks.slice(0, 5);
-
-    return {
-      totalClicks,
-      averageClicks,
-      topLinks
-    };
-  }, [links]); // Recalculate when links array changes
+  
+    return { totalClicks, averageClicks, topLinks };
+  }, [links]); // ✅ Make sure `links` updates correctly in MainApp
+  
+  
 
   return (
     <div className="space-y-6">

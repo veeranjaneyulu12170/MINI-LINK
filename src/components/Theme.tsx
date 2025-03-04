@@ -158,10 +158,10 @@ const Theme: React.FC = () => {
   };
 
   return (
-    <div className="flex gap-8 px-8">
+    <div className="flex flex-col lg:flex-row gap-8 px-4 lg:px-8">
       {/* Left Side - Mobile Preview */}
-      <div className="w-[350px] fixed scale-100 flex-shrink-0">
-        <div className="sticky top-8">
+      <div className="w-full lg:w-[350px] lg:fixed flex-shrink-0">
+        <div className="lg:sticky lg:top-8">
           <div className={`rounded-[30px] h-[450px] shadow-[10px_10px_10px_rgba(0,0,0,0.5)] p-4 border-2 aspect-[9/18] relative overflow-hidden transition-colors duration-300 ${themeClasses}`}>
             {/* Banner Image */}
             <div className={`relative w-full h-24 bg-gray-200 overflow-hidden flex items-center justify-center ${bannerClasses}`}>
@@ -228,9 +228,9 @@ const Theme: React.FC = () => {
       </div>
 
       {/* Right Side - Theme Editor */}
-      <div className="flex-1 max-w-3xl border-2 ml-[350px] border-indigo-200 p-4 rounded-xl">
+      <div className="flex-1 max-w-3xl lg:ml-[350px] border-4 border-indigo-300 p-4 rounded-xl">
         {/* Banner Image Upload */}
-        <div className="relative w-full h-[120px] bg-gray-200 rounded-lg overflow-hidden mb-6" style={{ aspectRatio: "3 / 1" }}>
+        <div className="relative w-full h-[120px] bg-gray-200 rounded-lg border-2 border-indigo-300 overflow-hidden mb-6" style={{ aspectRatio: "3 / 1" }}>
           {bannerImage ? (
             <img
               src={bannerImage}
@@ -287,7 +287,7 @@ const Theme: React.FC = () => {
           {/* Color Themes */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Color Theme</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {themeOptions.map((theme) => (
                 <button
                   key={theme.name}
@@ -295,6 +295,7 @@ const Theme: React.FC = () => {
                   className={`p-4 rounded-lg border-2 flex flex-col items-center ${
                     selectedTheme === theme.name ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'
                   }`}
+
                 >
                   {theme.icon}
                   <span className="capitalize mt-2">{theme.name}</span>
@@ -306,7 +307,7 @@ const Theme: React.FC = () => {
           {/* Button Style */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Button Style</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {buttonOptions.map((style) => (
                 <button
                   key={style.name}
@@ -325,7 +326,7 @@ const Theme: React.FC = () => {
           {/* Profile Picture Style */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Profile Picture Style</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {profileOptions.map((style) => (
                 <button
                   key={style.name}
@@ -344,7 +345,7 @@ const Theme: React.FC = () => {
           {/* Banner Style */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Banner Style</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {bannerOptions.map((style) => (
                 <button
                   key={style.name}
@@ -363,7 +364,7 @@ const Theme: React.FC = () => {
           {/* Font Style */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Font Style</h3>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {fontOptions.map((style) => (
                 <button
                   key={style.name}
@@ -378,12 +379,10 @@ const Theme: React.FC = () => {
               ))}
             </div>
           </div>
-
-        </div> {/* ✅ Closing `div` for Theme Settings Section */}
-      </div> {/* ✅ Closing `div` for Right-Side Editor */}
+        </div>
+      </div>
     </div>
   );
 };
 
-
-export default Theme; {/* ✅ Exporting the Theme component */}
+export default Theme;

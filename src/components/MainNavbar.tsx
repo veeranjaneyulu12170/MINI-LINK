@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LinkIcon } from 'lucide-react';
+import { LinkIcon, Menu, X } from 'lucide-react';
 import { User } from '../types';
 
 interface MainNavbarProps {
@@ -12,6 +12,7 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ user, onLogout }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isLandingPage = location.pathname === '/';
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleNavigation = (sectionId: string) => {
     if (isLandingPage) {
@@ -25,6 +26,7 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ user, onLogout }) => {
       localStorage.setItem('lastSection', sectionId); // Save section to scroll to
       navigate('/', { replace: true }); // Use replace to prevent back button issues
     }
+    setIsMenuOpen(false); // Close mobile menu after navigation
   };
 
   return (
@@ -38,7 +40,18 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ user, onLogout }) => {
             </Link>
           </div>
 
-          <div className="flex items-center space-x-8">
+          {/* Mobile menu button */}
+          <div className="flex md:hidden items-center">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-700 hover:text-indigo-600 focus:outline-none"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+
+          {/* Desktop navigation */}
+          <div className="hidden md:flex items-center space-x-8">
             <Link 
               to="/" 
               className={`text-gray-700 hover:text-indigo-600 ${location.pathname === '/' ? 'text-indigo-600' : ''}`}
@@ -100,9 +113,76 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ user, onLogout }) => {
             </div>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <div className="md:hidden py-4 border-t border-gray-200">
+            <div className="flex flex-col space-y-4 px-2 pb-3">
+              <Link 
+                to="/" 
+                className={`text-gray-700 hover:text-indigo-600 ${location.pathname === '/' ? 'text-indigo-600' : ''}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Home
+              </Link>
+              <button 
+                onClick={() => handleNavigation('features')} 
+                className="text-left text-gray-700 hover:text-indigo-600"
+              >
+                Features
+              </button>
+              <button 
+                onClick={() => handleNavigation('pricing')} 
+                className="text-left text-gray-700 hover:text-indigo-600"
+              >
+                Pricing
+              </button>
+              <button 
+                onClick={() => handleNavigation('testimonials')} 
+                className="text-left text-gray-700 hover:text-indigo-600"
+              >
+                Testimonials
+              </button>
+              <button 
+                onClick={() => handleNavigation('contact')} 
+                className="text-left text-gray-700 hover:text-indigo-600"
+              >
+                Contact
+              </button>
+              {user ? (
+                <>
+                  <Link 
+                    to="/app" 
+                    className={`text-gray-700 hover:text-indigo-600 ${location.pathname.startsWith('/app') ? 'text-indigo-600' : ''}`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      if (onLogout) onLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 w-full text-left"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 block text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
 };
 
-export default MainNavbar; 
+export default MainNavbar;

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: 'https://minilink1.onrender.com/api', // Add /api to the base URL
+  baseURL: 'https://mini-link-ddch.onrender.com', // Add /api to the base URL
   headers: {
     'Content-Type': 'application/json'
   }

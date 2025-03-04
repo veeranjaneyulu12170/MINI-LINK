@@ -91,8 +91,8 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="space-y-6 w-full max-w-3xl mx-auto px-4 sm:px-6">
+      <div className=" h-screen w-full p-4 sm:p-6 rounded-lg shadow-[0px_14px_35px_0px_rgba(255,255,255,0.5)]">
         <h2 className="text-lg font-semibold mb-4">Add New Link</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title Input */}
@@ -105,7 +105,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink }) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter link title"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
@@ -119,12 +119,12 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink }) => {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="example.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
           {/* Color Pickers */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <ColorPickerWithProgress
               label="Background Color"
               color={backgroundColor}
@@ -143,7 +143,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink }) => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+            className="w-full bg-indigo-600 text-white px-6 py-2 rounded-xl hover:bg-indigo-700 transition-colors"
           >
             Add Link
           </button>
@@ -152,25 +152,25 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink }) => {
 
       {/* Added Links List */}
       {addedLinks.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">Recently Added Links</h3>
           <div className="space-y-3">
             {addedLinks.map((link) => (
               <div
                 key={link._id}
-                className="flex items-center justify-between p-3 border rounded-lg"
+                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 border rounded-lg gap-2"
                 style={{
                   backgroundColor: link.backgroundColor || '#ffffff',
                   color: link.textColor || '#000000'
                 }}
               >
-                <div>
-                  <h4 className="font-medium">{link.title}</h4>
-                  <p className="text-sm opacity-75">{link.url}</p>
+                <div className="overflow-hidden">
+                  <h4 className="font-medium truncate">{link.title}</h4>
+                  <p className="text-sm opacity-75 truncate">{link.url}</p>
                 </div>
                 <button
                   onClick={() => handleDelete(link._id)}
-                  className="text-red-500 hover:text-red-700 p-2"
+                  className="text-red-500 hover:text-red-700 p-2 self-end sm:self-center"
                 >
                   Delete
                 </button>

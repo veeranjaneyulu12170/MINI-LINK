@@ -122,5 +122,29 @@ router.post('/reorder', auth, async (req: AuthRequest, res) => {
     res.status(500).json({ error: 'Failed to reorder links' });
   }
 });
+// Increment click count for a link
+router.post('/:id/clicks', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Invalid link ID' });
+    }
+
+    const link = await Link.findById(id);
+
+    if (!link) {
+      return res.status(404).json({ error: 'Link not found' });
+    }
+
+    link.clicks = (link.clicks || 0) + 1;
+    await link.save();
+
+    res.json({ message: 'Click count updated', clicks: link.clicks });
+  } catch (error) {
+    console.error('Error updating clicks:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 export default router; 
