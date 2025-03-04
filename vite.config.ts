@@ -12,15 +12,17 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:5000',
+        target: 'https://minilink1.onrender.com',
         changeOrigin: true,
         secure: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
       },
     },
   },
   build: {
     outDir: 'dist',
     sourcemap: false,
+    minify: true,
     emptyOutDir: true,
     rollupOptions: {
       output: {

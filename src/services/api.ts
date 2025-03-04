@@ -1,31 +1,36 @@
 import axios from 'axios';
 
+// Create axios instance with base URL
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: 'https://minilink1.onrender.com/api', // Add /api to the base URL
   headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true
+    'Content-Type': 'application/json'
+  }
 });
 
-// Add request interceptor to include token
+// Add auth token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log('Request Config:', config); // Debug request
   return config;
 });
 
-// Add response interceptor to handle errors
+// Add response interceptor for debugging
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response:', response);
+    return response;
+  },
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
+    console.error('API Error:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+      url: error.config?.url
+    });
     return Promise.reject(error);
   }
 );
