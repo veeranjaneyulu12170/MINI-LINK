@@ -40,17 +40,32 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
     setLoading(true);
   
     try {
-      const response = await auth.login(email, password);
-      if (response.data.user && response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user)); // ✅ Store user data
-        setUser(response.data.user);
-        navigate('/app', { replace: true });
+      if (isLogin) {
+        // Handle Login
+        const response = await auth.login(email, password);
+        if (response.data.user && response.data.token) {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          setUser(response.data.user);
+          navigate('/app', { replace: true });
+        }
       } else {
-        setError("Login failed. Please try again.");
+        // Handle Register
+        if (!name || !email || !password) {
+          setError("All fields are required");
+          return;
+        }
+        const response = await auth.register(name, email, password);
+        if (response.data.user && response.data.token) {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          setUser(response.data.user);
+          navigate('/app', { replace: true });
+        }
       }
-    } catch (err) {
-      setError("Invalid email or password");
+    } catch (err: any) {
+      console.error('Auth error:', err);
+      setError(err.response?.data?.message || (isLogin ? "Invalid email or password" : "Registration failed"));
     } finally {
       setLoading(false);
     }

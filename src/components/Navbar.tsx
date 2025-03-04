@@ -22,7 +22,7 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, links, onLogou
   return (
     <div className="fixed left-0 top-0  h-screen w-64 bg-indigo-700 text-white flex flex-col p-4 overflow-y-auto shadow-lg">
       {/* Logo */}
-      <div className="flex items-center mb-8 mt-10">
+      <div className="flex items-center mb-8 mt-[60px]">
         <LinkIcon className="h-6 w-6 mr-2" />
         <h1 className="text-xl font-bold">MiniLink</h1>
       </div>
