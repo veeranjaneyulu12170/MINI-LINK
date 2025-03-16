@@ -516,7 +516,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex justify-center items-center bg-white border border-gray-300 rounded-md shadow-sm px-4 py-2 mb-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="w-full flex justify-center items-center bg-white border border-gray-300 rounded-2xl shadow-sm px-4 py-2 mb-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -576,7 +576,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
                     id="firstName"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-2 border border-gray-300 rounded-xl"
                   />
                 </div>
                 <div className="mb-4">
@@ -588,7 +588,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
                     id="lastName"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-2 border border-gray-300 rounded-xl"
                   />
                 </div>
               </>
@@ -603,7 +603,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded"
+                className="w-full p-2 border border-gray-300 rounded-xl"
               />
             </div>
             
@@ -617,7 +617,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded-xl"
                 />
                 {isLogin && (
                   <button
@@ -644,7 +644,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
                   id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded-xl"
                 />
               </div>
             )}
@@ -673,7 +673,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition-colors mb-4"
+              className="w-full bg-indigo-600 text-white py-2 rounded-xl hover:bg-indigo-700 transition-colors mb-4"
             >
               {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create an account')}
             </button>
@@ -712,7 +712,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
           <div className="absolute inset-0 left-1/4 bg-green-800 z-10"></div>
           <div className="absolute inset-0 z-20">
             <img 
-              src="/profile-image.jpg" 
+              src="src\public\images\Frame.png" 
               alt="Person with thoughtful expression" 
               className="object-cover object-center w-full h-full"
             />
