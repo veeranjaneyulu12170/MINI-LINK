@@ -31,6 +31,10 @@ export default class LinksService {
 
   async create(linkData: CreateLinkData) {
     try {
+      console.log('Creating link with data:', linkData);
+      console.log('API URL:', axiosInstance.defaults.baseURL);
+      console.log('Full request URL:', `${axiosInstance.defaults.baseURL}/api/links`);
+      
       // Validate required fields
       if (!linkData.title?.trim() || !linkData.url?.trim()) {
         throw new Error('Title and URL are required');
@@ -65,7 +69,7 @@ export default class LinksService {
       };
       
       console.log('Sending link data to server:', cleanedData);
-      const response = await axiosInstance.post<Link>(`${this.baseUrl}/api/links`, cleanedData);
+      const response = await axiosInstance.post('/api/links', cleanedData);
       console.log('Server response:', response);
       return response;
     } catch (error: any) {

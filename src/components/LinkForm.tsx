@@ -3,6 +3,7 @@ import { links, testBackendConnection } from "../services/api";
 import ColorPickerWithProgress from "./ColorPickerWithProgress";
 import { Link, User } from "../types"; // Import Link and User types
 import { useProfile } from '../context/ProfileContext';
+import { createLink } from '../services/links';
 
 interface LinkFormProps {
   addLink: (linkData: {
@@ -243,7 +244,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink, user }) => {
       console.log("Creating link with data:", linkData);
       
       // Call the updated createLink function
-      const newLink = await addLink(linkData);
+      const newLink = await createLink(linkData);
       console.log("Link created successfully:", newLink);
       
       // Add to local state
