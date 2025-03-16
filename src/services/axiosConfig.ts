@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Export the API_URL constant
+export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 console.log('API_URL being used:', API_URL); // Debug log
 

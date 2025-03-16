@@ -30,7 +30,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [profilePic, setProfilePic] = useState(() => localStorage.getItem('profilePic') || '');
   const [bannerImage, setBannerImage] = useState(() => localStorage.getItem('bannerImage') || '');
   const [links, setLinks] = useState([]);
-  const [addedLinks, setAddedLinks] = useState<any[]>([]);
+  const [addedLinks, setAddedLinks] = useState<Link[]>([]);
   const [activeTab, setActiveTab] = useState<'link' | 'shop'>('link');
   const [backgroundColor, setBackgroundColor] = useState(() => 
     localStorage.getItem('bannerBackgroundColor') || '#2B2B2B'
@@ -88,7 +88,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
         setProfilePic,
         setBannerImage,
         setLinks,
-        setAddedLinks,
+        setAddedLinks: (links: Link[]) => setAddedLinks(links),
         backgroundColor,
         setBackgroundColor,
         shareProfile,

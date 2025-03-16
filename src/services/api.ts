@@ -1,6 +1,7 @@
 import LinksService from './links';
 import AuthService from './auth';
-import axiosInstance, { API_URL } from './axiosConfig';
+import axiosInstance from './axiosConfig';
+import { API_URL } from './axiosConfig';
 
 console.log('Initializing API services with base URL:', API_URL);
 
