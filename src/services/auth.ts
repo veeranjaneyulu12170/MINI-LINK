@@ -1,6 +1,7 @@
 import axiosInstance from './axiosConfig';
 import { User, LoginResponse, RegisterResponse, GoogleAuthResponse } from '../types';
 import axios from 'axios';
+
 export default class AuthService {
   private baseUrl: string;
 
@@ -10,15 +11,16 @@ export default class AuthService {
 
   async login(email: string, password: string): Promise<{ data: LoginResponse }> {
     try {
+      console.log('Attempting login with API URL:', API_URL);
       const response = await axiosInstance.post<LoginResponse>(`${this.baseUrl}/login`, { email, password });
-      console.log("Auth service login response:", response.data);
+      console.log('Login response:', response.data);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
       return response;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login error details:', error);
       throw error;
     }
   }
@@ -182,4 +184,14 @@ export default class AuthService {
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
+
+  // Example Google OAuth initiation
+  initiateGoogleLogin = () => {
+    // Use the environment variable for the redirect URI
+    const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&access_type=offline`;
+    
+    console.log('Redirecting to Google OAuth URL:', googleAuthUrl);
+    window.location.href = googleAuthUrl;
+  };
 } 

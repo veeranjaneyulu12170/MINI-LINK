@@ -1,16 +1,19 @@
 import axios from 'axios';
 
-// Export the API_URL constant
-export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Get the API URL from environment variables with a proper fallback for production
+const isProd = import.meta.env.PROD;
+export const API_URL = import.meta.env.VITE_API_URL || 
+  (isProd ? 'https://mini-link-backend.onrender.com/api' : 'http://localhost:5000/api');
 
-console.log('API_URL being used:', API_URL); // Debug log
+console.log('Using API URL:', API_URL);
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
+  withCredentials: true // Important for cookies/sessions
 });
 
 // Request interceptor

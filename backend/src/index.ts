@@ -12,12 +12,38 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Updated CORS configuration
+// Configure CORS to allow requests from your frontend domain
 app.use(cors({
-  origin: '*', // Temporarily allow all origins for testing
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if(!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173', // Vite default port
+      'https://mini-link-frontend.onrender.com',
+      'https://minilink.onrender.com'
+    ];
+    
+    if(allowedOrigins.indexOf(origin) === -1){
+      console.log('CORS blocked request from:', origin);
+    }
+    
+    // Allow all origins in development
+    if(process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    // In production, check against allowed list
+    if(allowedOrigins.indexOf(origin) !== -1){
+      return callback(null, true);
+    } else {
+      return callback(null, true); // Temporarily allow all origins
+    }
+  },
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 

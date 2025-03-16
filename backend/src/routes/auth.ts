@@ -252,6 +252,12 @@ router.post('/google', async (req, res) => {
   }
 });
 
+// Example Google OAuth callback route
+router.get('/auth/google/callback', async (req, res) => {
+  // Handle the callback
+  // ...
+});
+
 // Add this temporary route to clear users (DELETE AFTER TESTING)
 router.delete('/clear-users', async (req, res) => {
   try {
@@ -262,6 +268,20 @@ router.delete('/clear-users', async (req, res) => {
     console.error('Error clearing users:', err);
     res.status(500).json({ error: 'Failed to clear users' });
   }
+});
+
+// Add a health check endpoint
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'API is running' });
+});
+
+// Add this route to test login functionality
+router.get('/login-test', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    message: 'Login endpoint is accessible',
+    env: process.env.NODE_ENV
+  });
 });
 
 export default router; 
