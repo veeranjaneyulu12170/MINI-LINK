@@ -260,6 +260,11 @@ router.post('/google-token', async (req, res) => {
     
     const { email, name, sub: googleId } = payload;
     
+    // Check if email exists
+    if (!email) {
+      return res.status(400).json({ error: 'Email not provided in Google token' });
+    }
+    
     // Check if user exists
     let user = await UserModel.findOne({ email });
     
@@ -268,7 +273,7 @@ router.post('/google-token', async (req, res) => {
       const hashedPassword = await bcrypt.hash(Math.random().toString(36).slice(-8), 10);
       
       user = new UserModel({
-        name: name || email.split('@')[0],
+        name: name || email.split('@')[0], // Now safe because we checked email exists
         email,
         googleId,
         password: hashedPassword

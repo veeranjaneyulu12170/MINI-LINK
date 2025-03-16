@@ -14,10 +14,22 @@ import {
   authorizedOrigins
 } from '../config/googleAuth';
 import Logo from './Logo';
+import axios from 'axios';
 
 interface LoginProps {
   setUser: (user: User) => void;
   setActiveTab?: (tab: string) => void;
+}
+
+// Define an interface for the Google response
+interface GoogleResponse {
+  tokenId: string;
+  profileObj?: {
+    email: string;
+    name: string;
+    imageUrl: string;
+  };
+  // Add other properties that might be in the response
 }
 
 const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
@@ -102,74 +114,28 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
     }
   };
   
-  const handleGoogleLogin = async () => {
-    setLoading(true);
+  const handleGoogleLogin = async (googleResponse: GoogleResponse) => {
     try {
-      // Get the client ID from environment variables
-      const clientId = getGoogleClientId();
+      const { tokenId } = googleResponse;
       
-      // Log the client ID for debugging
-      console.log("Using Google Client ID:", clientId ? "ID is set" : "ID is missing");
+      // Send the token to your backend
+      const response = await axios.post('/api/auth/google-token', { token: tokenId });
       
-      if (!clientId || clientId === 'undefined' || clientId === 'your-google-client-id') {
-        setError("Google Sign-In is not properly configured. Please contact the administrator.");
-        console.error("Invalid Google Client ID. Please set a valid VITE_GOOGLE_CLIENT_ID in .env.local file");
-        setLoading(false);
-        return;
-      }
+      // Handle the response
+      const { token, user } = response.data;
       
-      // Use the fallback method directly as it's more reliable
-      handleGoogleLoginFallback();
+      // Store in localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
       
-      // The code below is kept for reference but not used
-      /*
-      // Check if the current origin is in the list of authorized origins
-      if (!isAuthorizedOrigin()) {
-        const currentOrigin = window.location.origin;
-        console.warn(`Current origin (${currentOrigin}) is not in the list of authorized origins in the application.`);
-        console.warn('Authorized origins in the application:', authorizedOrigins);
-        console.warn('This is just a warning. The request will still be sent, but it may fail if the origin is not authorized in Google Cloud Console.');
-      }
+      // Update auth context
+      setUser(user);
       
-      // Create a container for the Google button
-      const googleButtonContainer = document.createElement('div');
-      googleButtonContainer.id = 'google-signin-button';
-      googleButtonContainer.style.display = 'none';
-      document.body.appendChild(googleButtonContainer);
-      
-      // Load the Google Sign-In API
-      if (!window.google) {
-        // If Google API is not loaded, load it
-        const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
-        script.async = true;
-        script.defer = true;
-        script.onload = () => {
-          initializeGoogleSignIn(clientId, googleButtonContainer.id);
-        };
-        script.onerror = (e) => {
-          console.error('Failed to load Google Sign-In script:', e);
-          setError("Failed to load Google Sign-In. Please try again later or use email/password.");
-          setLoading(false);
-          if (googleButtonContainer) {
-            document.body.removeChild(googleButtonContainer);
-          }
-          
-          // Automatically try the fallback method after a short delay
-          setTimeout(() => {
-            handleGoogleLoginFallback();
-          }, 1000);
-        };
-        document.head.appendChild(script);
-      } else {
-        // If Google API is already loaded, initialize Sign-In
-        initializeGoogleSignIn(clientId, googleButtonContainer.id);
-      }
-      */
-    } catch (err) {
-      console.error('Google auth error:', err);
-      setError("Google login failed. Please try again or use email/password.");
-      setLoading(false);
+      // Redirect to dashboard
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Google login error:', error);
+      setError('Failed to login with Google. Please try again.');
     }
   };
   
@@ -514,7 +480,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
           {/* Continue with Google */}
           <button
             type="button"
-            onClick={handleGoogleLogin}
+            onClick={() => handleGoogleLoginFallback()}
             disabled={loading}
             className="w-full flex justify-center items-center bg-white border border-gray-300 rounded-2xl shadow-sm px-4 py-2 mb-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
