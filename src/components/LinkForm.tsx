@@ -241,7 +241,8 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink, user }) => {
         productImage: activeTab === 'shop' ? productImage : null,
         isShop: activeTab === 'shop',
         shopPlatform: activeTab === 'shop' ? selectedShopPlatform : null,
-        isEnabled: activeTab === 'shop' ? isEnabled : true
+        isEnabled: activeTab === 'shop' ? isEnabled : true,
+        userId: user.id
       };
 
       console.log("Creating link with data:", linkData);
