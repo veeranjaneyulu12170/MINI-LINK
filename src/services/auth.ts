@@ -6,7 +6,7 @@ export default class AuthService {
   private baseUrl: string;
 
   constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
+    this.baseUrl = baseUrl.startsWith('/') ? baseUrl : `/${baseUrl}`;
   }
 
   async login(email: string, password: string): Promise<{ data: LoginResponse }> {
@@ -14,9 +14,9 @@ export default class AuthService {
       console.log('Attempting login with:');
       console.log('- API_URL:', API_URL);
       console.log('- this.baseUrl:', this.baseUrl);
-      console.log('- Full URL:', `${this.baseUrl}/login`);
+      console.log('- Full URL:', `${API_URL}${this.baseUrl}/login`);
       
-      const response = await axiosInstance.post<LoginResponse>(`${this.baseUrl}/login`, { email, password });
+      const response = await axiosInstance.post<LoginResponse>(`/api/auth/login`, { email, password });
       console.log('Login response:', response.data);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -44,7 +44,7 @@ export default class AuthService {
 
   async register(name: string, email: string, password: string): Promise<{ data: RegisterResponse }> {
     try {
-      const response = await axiosInstance.post<RegisterResponse>(`${this.baseUrl}/register`, { name, email, password });
+      const response = await axiosInstance.post<RegisterResponse>(`/api/auth/register`, { name, email, password });
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -62,16 +62,12 @@ export default class AuthService {
       console.log('Backend URL:', `${this.baseUrl}/google`);
       
       // Add a timeout to the request
-      const response = await axiosInstance.post<GoogleAuthResponse>(
-        `${this.baseUrl}/google`, 
-        { token },
-        { 
-          timeout: 15000,  // Increase timeout to 15 seconds
-          headers: {
-            'Content-Type': 'application/json'
-          }
+      const response = await axiosInstance.post<GoogleAuthResponse>(`/api/auth/google`, { token }, {
+        timeout: 15000,  // Increase timeout to 15 seconds
+        headers: {
+          'Content-Type': 'application/json'
         }
-      );
+      });
       
       console.log('Google auth response:', response.data);
       

@@ -2,6 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import AuthService from '../services/auth';
 import { API_URL } from '../services/axiosConfig';
 
+// Create the auth service with the correct path
+const authService = new AuthService('/api/auth');
+
 interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string) => void;

@@ -280,7 +280,12 @@ router.get('/login-test', (req, res) => {
   res.status(200).json({ 
     status: 'ok', 
     message: 'Login endpoint is accessible',
-    env: process.env.NODE_ENV
+    env: process.env.NODE_ENV,
+    routes: {
+      login: '/api/auth/login',
+      register: '/api/auth/register',
+      google: '/api/auth/google'
+    }
   });
 });
 

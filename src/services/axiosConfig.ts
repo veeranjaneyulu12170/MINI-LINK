@@ -3,7 +3,7 @@ import axios from 'axios';
 // Get the API URL from environment variables with a proper fallback for production
 const isProd = import.meta.env.PROD;
 export const API_URL = import.meta.env.VITE_API_URL || 
-  (isProd ? 'https://mini-link-backend.onrender.com/api' : 'http://localhost:5000/api');
+  (isProd ? 'https://mini-link-ddch.onrender.com' : 'http://localhost:5000');
 
 console.log('Using API URL:', API_URL);
 
