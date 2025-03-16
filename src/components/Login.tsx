@@ -712,7 +712,7 @@ const Login: React.FC<LoginProps> = ({ setUser, setActiveTab }) => {
           <div className="absolute inset-0 left-1/4 bg-green-800 z-10"></div>
           <div className="absolute inset-0 z-20">
             <img 
-              src="src\public\images\Frame.png" 
+              src="https://res.cloudinary.com/dvvhyfrjr/image/upload/v1742151488/images/fmfujtug1mcpsnthbf8y.png" 
               alt="Person with thoughtful expression" 
               className="object-cover object-center w-full h-full"
             />
