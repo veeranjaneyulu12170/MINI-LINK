@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { links, testBackendConnection, createLink } from "../services/api";
+import { testBackendConnection } from "../services/api";
+import { createLink } from "../services/links";
 import ColorPickerWithProgress from "./ColorPickerWithProgress";
 import { Link, User } from "../types"; // Import Link and User types
 import { useProfile } from '../context/ProfileContext';
