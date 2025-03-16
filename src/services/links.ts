@@ -16,12 +16,12 @@ export default class LinksService {
   private baseUrl: string;
 
   constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
+    this.baseUrl = '';
   }
 
   async getAll() {
     try {
-      const response = await axiosInstance.get<Link[]>(`${this.baseUrl}/api/links`);
+      const response = await axiosInstance.get<Link[]>('/api/links');
       return response;
     } catch (error) {
       console.error('Error fetching links:', error);
@@ -100,7 +100,7 @@ export default class LinksService {
 
   async delete(id: string) {
     try {
-      const response = await axiosInstance.delete(`${this.baseUrl}/api/links/${id}`);
+      const response = await axiosInstance.delete(`/api/links/${id}`);
       return response;
     } catch (error) {
       console.error('Error deleting link:', error);
@@ -115,7 +115,7 @@ export default class LinksService {
     location: string;
   }) {
     try {
-      const response = await axiosInstance.post<Link>(`${this.baseUrl}/api/links/${id}/clicks`, analyticsData);
+      const response = await axiosInstance.post<Link>(`/api/links/${id}/clicks`, analyticsData);
       return response;
     } catch (error) {
       console.error('Error incrementing clicks:', error);
@@ -125,7 +125,7 @@ export default class LinksService {
 
   async reorder(linkIds: string[]) {
     try {
-      const response = await axiosInstance.post<Link[]>(`${this.baseUrl}/api/links/reorder`, { linkIds });
+      const response = await axiosInstance.post<Link[]>(`/api/links/reorder`, { linkIds });
       return response;
     } catch (error) {
       console.error('Error reordering links:', error);

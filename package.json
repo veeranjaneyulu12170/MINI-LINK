@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "postinstall": "npm install axios --no-save",
-    "render-build": "npm install --omit=optional --legacy-peer-deps && vite build"
+    "render-build": "./build.sh"
   },
   "dependencies": {
     "@splinetool/react-spline": "^2.2.6",
@@ -40,12 +40,13 @@
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.8.2",
-    "vite": "^4.5.2"
+    "vite": "^4.5.2",
+    "rollup": "^3.29.4"
   },
   "overrides": {
     "rollup": "^3.29.4"
   },
   "resolutions": {
-    "rollup": "3.29.4"
+    "rollup": "^3.29.4"
   }
 }
