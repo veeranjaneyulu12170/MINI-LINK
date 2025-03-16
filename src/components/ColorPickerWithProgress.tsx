@@ -4,16 +4,19 @@ interface ColorPickerProps {
   label: string;
   color: string;
   setColor: (color: string) => void;
+  disabled?: boolean;
 }
 
 const ColorPickerWithProgress: React.FC<ColorPickerProps> = ({
   label,
   color,
   setColor,
+  disabled = false,
 }) => {
   const [progress, setProgress] = useState(0);
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     setColor(e.target.value);
     setProgress(Math.floor(Math.random() * 100)); // Simulated progress
   };
@@ -26,12 +29,12 @@ const ColorPickerWithProgress: React.FC<ColorPickerProps> = ({
   const offset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="border-4 border-crimson-400 rounded-lg p-4 shadow-md">
+    <div className={`border-4 border-crimson-400 rounded-lg p-4 shadow-md ${disabled ? 'opacity-70' : ''}`}>
       <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
       <div className="relative flex items-center gap-2">
         {/* Circular Color Indicator */}
         <div
-          className="w-10 h-10 rounded-full border border-gray-400 shadow"
+          className={`w-10 h-10 rounded-full border border-gray-400 shadow ${disabled ? 'cursor-not-allowed' : ''}`}
           style={{ backgroundColor: color }}
         ></div>
 
@@ -41,6 +44,7 @@ const ColorPickerWithProgress: React.FC<ColorPickerProps> = ({
           value={color}
           onChange={handleColorChange}
           className="w-10 h-10 opacity-0 absolute cursor-pointer"
+          disabled={disabled}
         />
       </div>
 
@@ -63,7 +67,7 @@ const ColorPickerWithProgress: React.FC<ColorPickerProps> = ({
               cy={size / 2}
               r={radius}
               strokeWidth={strokeWidth}
-              className="stroke-blue-500 transition-all duration-500"
+              className={`stroke-blue-500 transition-all duration-500 ${disabled ? 'opacity-50' : ''}`}
               fill="transparent"
               strokeDasharray={circumference}
               strokeDashoffset={offset}

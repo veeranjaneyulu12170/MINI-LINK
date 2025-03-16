@@ -13,7 +13,8 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { User } from "../types";
-import { useAppearance } from '../context/AppearanceContext';
+import { useProfile } from '../context/ProfileContext';
+import Logo from './Logo';
 
 interface AppearanceProps {
   user: User;
@@ -36,8 +37,12 @@ const Appearance: React.FC<AppearanceProps> = ({ user, updateUser }) => {
     profilePic,
     setProfilePic,
     bannerImage,
-    setBannerImage
-  } = useAppearance();
+    setBannerImage,
+    backgroundColor,
+    setBackgroundColor,
+    addedLinks,
+    shareProfile
+  } = useProfile();
   const socialMediaOptions: SocialMediaOption[] = [
     {
       name: 'Twitter',
@@ -116,17 +121,52 @@ const Appearance: React.FC<AppearanceProps> = ({ user, updateUser }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showNameBioModal, setShowNameBioModal] = useState(false);
 
-  // Handle Image Upload
+  // Handle Image Upload with preview
   const handleImageUpload = (
     event: React.ChangeEvent<HTMLInputElement>,
     type: "profile" | "banner"
   ) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      const imageURL = URL.createObjectURL(file);
-      if (type === "profile") setProfilePic(imageURL);
-      else setBannerImage(imageURL);
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
+      return;
     }
+
+    // Check file size (e.g., max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert('File size should be less than 5MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      if (type === "profile") {
+        setProfilePic(base64String);
+        localStorage.setItem('profilePic', base64String);
+      } else {
+        setBannerImage(base64String);
+        localStorage.setItem('bannerImage', base64String);
+      }
+    };
+
+    reader.onerror = () => {
+      alert('Error reading file');
+    };
+
+    reader.readAsDataURL(file);
+
+    // Reset the input value to allow uploading the same file again
+    event.target.value = '';
+  };
+
+  // Handle background color change
+  const handleColorChange = (color: string) => {
+    setBackgroundColor(color);
   };
 
   const handleUpdateUser = () => {
@@ -138,113 +178,160 @@ const Appearance: React.FC<AppearanceProps> = ({ user, updateUser }) => {
     }
   };
 
+  // Update the Name & Bio Modal save handler
+  const handleSaveNameBio = () => {
+    setUsername(username);
+    setBio(bio);
+    setShowNameBioModal(false);
+  };
+
+  // Add activeTab state
+  const [activeTab, setActiveTab] = useState<'link' | 'shop'>('link');
+
   return (
     <div className="flex flex-col lg:flex-row gap-8 px-4 lg:px-8">
       {/* Left Side - Mobile Preview */}
       <div className="w-full lg:w-[350px] lg:fixed lg:flex-shrink-0 mb-8 lg:mb-0">
         <div className="lg:sticky top-8 flex justify-center lg:justify-start">
-          <div className="bg-white rounded-[30px] h-[450px]  shadow-[10px_10px_10px_rgba(0,0,0,0.5)] p-4 border-2 border-indigo-500 aspect-[9/18] relative overflow-hidden">
+          <div className="bg-white rounded-[30px] h-[450px] shadow-[10px_10px_10px_rgba(0,0,0,0.5)] p-4 border-2 border-indigo-500 aspect-[9/18] relative overflow-hidden">
+            {/* Share Button */}
+            <button
+              onClick={shareProfile}
+              className="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-white/90 transition-colors"
+            >
+              <Share2 className="w-5 h-5 text-gray-600" />
+            </button>
+
             {/* Banner Image */}
-            <div className="relative w-full h-24 bg-gray-200 border-2 border-indigo-300 rounded-lg overflow-hidden flex items-center justify-center">
+            <div 
+              className="relative w-full h-24 rounded-lg overflow-hidden"
+              style={{ backgroundColor: backgroundColor }}
+            >
               {bannerImage ? (
                 <img src={bannerImage} alt="Banner" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-gray-500">No Banner</span>
-              )}
-              {/* Three Dots Menu */}
-              <button
-                className="absolute top-2 right-4 scale-50 bg-white p-2 rounded-full shadow hover:bg-gray-100"
-                onClick={() => setShowEditModal(true)}
-              >
-                <MoreHorizontal />
-              </button>
+              ) : null}
             </div>
 
             {/* Profile Section */}
-            <div className="absolute top-[4.5rem] left-1/2 transform -translate-x-1/2 flex flex-col items-center w-full">
-              {/* Profile Picture */}
-              <label htmlFor="profilePicInputRight" className="cursor-pointer">
-                <input
-                  type="file"
-                  id="profilePicInputRight"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleImageUpload(e, "profile")}
-                />
-                <div className="w-20 h-20 bg-blue-200 rounded-full overflow-hidden border-4 border-white flex items-center justify-center">
+            <div className="relative -mt-10 flex flex-col items-center">
+              <div className="w-20 h-20 bg-white rounded-full overflow-hidden border-4 border-white shadow-lg">
                   {profilePic ? (
                     <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-3xl">@</span>
+                  <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                    <span className="text-2xl text-gray-400">@</span>
+                  </div>
                   )}
                 </div>
-              </label>
+              <h2 className="mt-2 text-lg font-semibold">{username}</h2>
+              {bio && <p className="text-sm text-gray-500 text-center mt-1">{bio}</p>}
+            </div>
 
-              {/* Username & Bio */}
-              <h2 className="text-sm font-semibold cursor-pointer mt-2 text-center w-full" onClick={() => setShowNameBioModal(true)}>
-                {username}
-              </h2>
-              <p
-                className="text-gray-500 text-sm cursor-pointer text-center w-full break-words max-w-[250px]"
-                onClick={() => setShowNameBioModal(true)}
-              >
-                {bio}
-              </p>
+            {/* Links Section */}
+            <div className="mt-3 space-y-2 overflow-y-auto max-h-[calc(100%-10rem)] px-2">
+              {/* Tabs */}
+              <div className="flex space-x-2 mb-3">
+                <button
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium ${
+                    activeTab === 'link'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                  onClick={() => setActiveTab('link')}
+                >
+                  Link
+                </button>
+                <button
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium ${
+                    activeTab === 'shop'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                  onClick={() => setActiveTab('shop')}
+                >
+                  Shop
+                </button>
+              </div>
 
-              {/* Social Media Icons (Only Show If Links Exist) */}
-              {socialLinks.length > 0 && (
-                <div className="flex justify-center gap-3 mt-2">
-                  {socialLinks.map((link, index) => {
-                    const socialMedia = socialMediaOptions.find(option => option.name === link.name);
-                    return (
-                      <a key={index} href={link.url} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:text-indigo-700">
-                        {socialMedia?.icon}
-                      </a>
-                    );
-                  })}
+              {/* Added Links Preview */}
+              {addedLinks
+                .filter(link => activeTab === 'shop' ? link.isShop : !link.isShop)
+                .map((link, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-100 rounded-lg p-2 flex items-center space-x-2"
+                  >
+                    {/* Icon based on link type */}
+                    <div className={`w-8 h-8 ${
+                      link.isShop ? 'bg-green-600' : 
+                      link.title.toLowerCase().includes('youtube') ? 'bg-red-600' :
+                      link.title.toLowerCase().includes('instagram') ? 'bg-gradient-to-tr from-purple-500 to-pink-500' :
+                      'bg-blue-600'
+                    } rounded-lg flex items-center justify-center`}>
+                      {link.isShop ? (
+                        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M13 12h7v1.5h-7m0-4h7V11h-7m0 3.5h7V16h-7m8-12H3a2 2 0 00-2 2v13a2 2 0 002 2h18a2 2 0 002-2V6a2 2 0 00-2-2m0 15h-9V6h9v13Z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                        </svg>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-gray-900">{link.title}</p>
+                    </div>
+                    {link.isShop && (
+                      <button 
+                        onClick={() => window.open(link.url, '_blank')}
+                        className="px-2 py-0.5 bg-green-600 text-white text-[10px] rounded-full hover:bg-green-700 transition-colors"
+                      >
+                        Buy
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+              {/* Empty state message */}
+              {addedLinks.filter(link => activeTab === 'shop' ? link.isShop : !link.isShop).length === 0 && (
+                <div className="text-center text-gray-500 text-xs py-3">
+                  {activeTab === 'shop' 
+                    ? 'No shop links added yet' 
+                    : 'No links added yet'
+                  }
                 </div>
               )}
+
+              {/* Get Connected Button */}
+              <button 
+                className="w-full py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition-colors mt-2"
+                onClick={() => {
+                  // Add the same functionality as in LinkForm
+                  window.open(`https://yourwebsite.com/${username}`, '_blank');
+                }}
+              >
+                Get Connected
+              </button>
+            </div>
+
+            {/* Logo at the bottom */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+              <Logo className="scale-75 opacity-50" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Right Side - Editor */}
-      <div className="flex-1 lg:ml-[350px] max-w-3xl mx-auto border-4 border-indigo-400 p-4 rounded-xl">
-        {/* Banner Image in Editor */}
-        <div className="relative w-full h-[150px] sm:h-[200px] bg-gray-200 rounded-lg border-2 border-indigo-300 overflow-hidden" style={{ aspectRatio: "3 / 1" }}>
-          {bannerImage ? (
-            <img
-              src={bannerImage}
-              alt="Banner"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="flex items-center justify-center w-full h-full text-gray-500">
-              No Banner
-            </span>
-          )}
-          {/* Three Dots Menu */}
-          <button
-            className="absolute top-3 right-3 bg-white p-2 rounded-full shadow hover:bg-gray-100"
-            onClick={() => setShowEditModal(true)}
-          >
-            <MoreHorizontal />
-          </button>
-        </div>
-
-        {/* Profile Section Below Banner */}
-        <div className="relative bottom-10 sm:bottom-14 left-4 sm:left-6 flex flex-col items-start px-2 sm:px-4">
-          {/* Profile Picture */}
-          <label htmlFor="profilePicInputEditor" className="cursor-pointer">
-            <input
-              type="file"
-              id="profilePicInputEditor"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => handleImageUpload(e, "profile")}
-            />
-            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-blue-200 rounded-full overflow-hidden border-4 border-blue-400">
+      <div className="flex-1 lg:ml-[350px] max-w-3xl mx-auto border-4 border-gray-200 p-4 rounded-xl">
+        {/* Profile Section */}
+        <div className="bg-white rounded-lg p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">Profile</h2>
+          
+          {/* Profile Picture with new layout */}
+          <div className="flex flex-col items-center">
+            {/* Profile Picture Circle */}
+            <div className="w-24 h-24 bg-gray-100 rounded-full overflow-hidden mb-4">
               {profilePic ? (
                 <img
                   src={profilePic}
@@ -252,117 +339,170 @@ const Appearance: React.FC<AppearanceProps> = ({ user, updateUser }) => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-2xl sm:text-3xl flex items-center justify-center h-full">
-                  @
-                </span>
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-2xl text-gray-400">@</span>
+                </div>
               )}
             </div>
+
+            {/* Upload Button */}
+            <div className="w-full max-w-[240px]">
+              <label htmlFor="profilePicInput" className="block">
+                <input
+                  type="file"
+                  id="profilePicInput"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, "profile")}
+                  className="hidden"
+                />
+                <button 
+                  onClick={() => document.getElementById('profilePicInput')?.click()}
+                  className="w-full py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
+                >
+                  Pick an image
+                </button>
           </label>
 
-          {/* Username & Bio (Click to Edit) */}
-          <h2
-            className="text-base sm:text-lg font-semibold cursor-pointer ml-2 mt-1"
-            onClick={() => setShowNameBioModal(true)}
-          >
-            {username}
-          </h2>
-          <p
-            className="text-gray-500 text-xs sm:text-sm mt-1 ml-2 cursor-pointer"
-            onClick={() => setShowNameBioModal(true)}
-          >
-            {bio}
-          </p>
-
-          {/* Social Media Links Section */}
-          <div className="mt-4 w-full flex flex-col items-center">
-            <h3 className="text-sm font-semibold text-gray-600 mb-2">Social Links</h3>
-
-            {/* Icons to Add Social Media Links */}
-            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-4">
-              {socialMediaOptions.map((option) => (
+              {/* Remove Button - Only show when there's a profile picture */}
+              {profilePic && (
                 <button
-                  key={option.name}
-                  onClick={() => setActivePlatform(option.name)}
-                  className="p-2 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white shadow-md"
+                  onClick={() => {
+                    setProfilePic('');
+                    localStorage.removeItem('profilePic');
+                  }}
+                  className="w-full mt-2 text-gray-500 text-sm hover:text-gray-700"
                 >
-                  {option.icon}
+                  Remove
                 </button>
-              ))}
+              )}
             </div>
 
-            {/* Input for Adding Link with Customization */}
-            {activePlatform && (
-              <div className="flex flex-col items-center gap-2 bg-gray-100 rounded-lg px-3 py-2 w-full sm:w-[90%] mb-4">
-                <div className="flex items-center w-full">
-                  <span className="text-indigo-600 mr-1">{socialMediaOptions.find(option => option.name === activePlatform)?.icon}</span>
+            {/* Profile Title & Bio */}
+            <div className="w-full mt-6">
+              <div className="mb-4">
+                <label className="block text-sm text-gray-600 mb-1">Profile Title</label>
                   <input
-                    type="url"
-                    value={currentUrl}
-                    onChange={(e) => setCurrentUrl(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, activePlatform, socialMediaOptions.find(option => option.name === activePlatform)?.prefix || "")}
-                    placeholder={`Enter ${activePlatform} URL`}
-                    className={`flex-1 text-xs sm:text-sm bg-transparent focus:outline-none border p-1 rounded-lg ${
-                      currentUrl && !currentUrl.startsWith(socialMediaOptions.find(option => option.name === activePlatform)?.prefix || "") ? "border-red-500" : "border-gray-300"
-                    }`}
-                  />
-                  <button onClick={() => setActivePlatform(null)} className="text-red-500 hover:text-red-700 ml-1">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-xl"
+                  placeholder="@popopo_08"
+                />
                 </div>
 
-                {/* Customization Options (Visible Only While Entering) */}
-                <div className="flex flex-wrap gap-2 w-full justify-between">
-                  {/* Background Color */}
-                  <select
-                    className="border p-1 rounded text-xs sm:text-sm"
-                    value={currentCustomization.color}
-                    onChange={(e) => setCurrentCustomization({ ...currentCustomization, color: e.target.value })}
-                  >
-                    <option value="bg-blue-500">Blue</option>
-                    <option value="bg-red-500">Red</option>
-                    <option value="bg-green-500">Green</option>
-                    <option value="bg-yellow-500">Yellow</option>
-                    <option value="bg-gray-500">Gray</option>
-                  </select>
-
-                  {/* Button Shape */}
-                  <select
-                    className="border p-1 rounded-lg text-xs sm:text-sm"
-                    value={currentCustomization.shape}
-                    onChange={(e) => setCurrentCustomization({ ...currentCustomization, shape: e.target.value })}
-                  >
-                    <option value="rounded-lg">Rounded</option>
-                    <option value="rounded-full">Pill</option>
-                    <option value="rounded-none">Square</option>
-                  </select>
-
-                  {/* Text Color */}
-                  <select
-                    className="border p-1 rounded text-xs sm:text-sm"
-                    value={currentCustomization.textColor}
-                    onChange={(e) => setCurrentCustomization({ ...currentCustomization, textColor: e.target.value })}
-                  >
-                    <option value="text-white">White</option>
-                    <option value="text-black">Black</option>
-                    <option value="text-gray-300">Gray</option>
-                  </select>
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">Bio</label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-xl resize-none"
+                  placeholder="Bio"
+                  rows={2}
+                  maxLength={80}
+                />
+                <div className="text-right text-xs text-gray-500">
+                  {bio.length}/80
                 </div>
               </div>
-            )}
+            </div>
+          </div>
+        </div>
 
-            {/* Added Social Media Links */}
-            <div className="mt-4 w-full flex flex-col items-center">
-              {socialLinks.map((link, index) => (
-                <div key={index} className={`flex items-center justify-between w-full sm:w-[90%] px-2 sm:px-4 py-2 ${link.color} ${link.shape} mb-2`}>
-                  <a href={link.url} target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 ${link.textColor} font-medium`}>
-                    {socialMediaOptions.find(option => option.name === link.name)?.icon}
-                    <span className="text-xs sm:text-sm">{link.name}</span>
-                  </a>
-                  <button onClick={() => setSocialLinks(socialLinks.filter((_, i) => i !== index))} className="text-white hover:text-gray-300">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+        {/* Banner Section */}
+        <div className="bg-white rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">Banner</h2>
+          
+          <div className="flex flex-col items-center">
+            {/* Banner Preview */}
+            <div 
+              className="w-full h-32 rounded-lg overflow-hidden mb-4"
+              style={{ backgroundColor: backgroundColor }}
+            >
+              {bannerImage ? (
+                <img
+                  src={bannerImage}
+                  alt="Banner"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-2 overflow-hidden">
+                      {profilePic ? (
+                        <img
+                          src={profilePic}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-2xl text-gray-400">@</span>
+              </div>
+            )}
+                    </div>
+                    <div className="text-white">@{username}</div>
+                    <div className="text-gray-400 text-sm">@{username}</div>
+                  </div>
                 </div>
-              ))}
+              )}
+            </div>
+
+            {/* Banner Upload */}
+            <div className="w-full max-w-[240px]">
+              <label htmlFor="bannerInput" className="block">
+                <input
+                  type="file"
+                  id="bannerInput"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, "banner")}
+                  className="hidden"
+                />
+                <button 
+                  onClick={() => document.getElementById('bannerInput')?.click()}
+                  className="w-full py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
+                >
+                  Pick an image
+                </button>
+              </label>
+
+              {/* Remove Button - Only show when there's a banner image */}
+              {bannerImage && (
+                <button
+                  onClick={() => {
+                    setBannerImage('');
+                    localStorage.removeItem('bannerImage');
+                  }}
+                  className="w-full mt-2 text-gray-500 text-sm hover:text-gray-700"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+
+            {/* Custom Background Color */}
+            <div className="w-full max-w-[240px] mt-4">
+              <label className="block text-sm text-gray-600 mb-2">Custom Background Color</label>
+              <div className="flex gap-2 items-center justify-between">
+                <button 
+                  onClick={() => handleColorChange('#2B2B2B')}
+                  className={`w-8 h-8 rounded-full bg-[#2B2B2B] border-2 ${backgroundColor === '#2B2B2B' ? 'border-blue-500' : 'border-white'} shadow-md`}
+                />
+                <button 
+                  onClick={() => handleColorChange('#FFFFFF')}
+                  className={`w-8 h-8 rounded-full bg-white border-2 ${backgroundColor === '#FFFFFF' ? 'border-blue-500' : 'border-gray-200'} shadow-md`}
+                />
+                <button 
+                  onClick={() => handleColorChange('#000000')}
+                  className={`w-8 h-8 rounded-full bg-black border-2 ${backgroundColor === '#000000' ? 'border-blue-500' : 'border-white'} shadow-md`}
+                />
+                <input
+                  type="text"
+                  value={backgroundColor}
+                  onChange={(e) => handleColorChange(e.target.value)}
+                  placeholder="#000000"
+                  className="w-24 p-1 text-sm border border-gray-300 rounded"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -416,7 +556,6 @@ const Appearance: React.FC<AppearanceProps> = ({ user, updateUser }) => {
               className="w-full p-2 bg-transparent border rounded-xl mb-4 text-sm"
               placeholder="Enter bio"
             ></textarea>
-            {/* Buttons */}
             <div className="flex justify-end space-x-2">
               <button
                 className="px-3 py-1 sm:px-4 sm:py-2 text-sm bg-gray-300 rounded-2xl"
@@ -426,7 +565,7 @@ const Appearance: React.FC<AppearanceProps> = ({ user, updateUser }) => {
               </button>
               <button
                 className="px-3 py-1 sm:px-4 sm:py-2 text-sm bg-blue-500 text-white rounded-2xl"
-                onClick={() => setShowNameBioModal(false)}
+                onClick={handleSaveNameBio}
               >
                 Save
               </button>

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { auth, AuthRequest } from '../middleware/auth';
 import Link from '../models/Link';
+import { nanoid } from 'nanoid';
 
 const router = Router();
 
@@ -20,6 +21,10 @@ router.post('/', auth, async (req: AuthRequest, res) => {
   try {
     const { title, url, icon, backgroundColor, textColor } = req.body;
     
+    // Log the request body and user info
+    console.log('Create link request body:', req.body);
+    console.log('User from auth middleware:', req.user);
+    
     // Validate required fields
     if (!title || !url) {
       return res.status(400).json({ error: 'Title and URL are required' });
@@ -37,10 +42,16 @@ router.post('/', auth, async (req: AuthRequest, res) => {
       .sort({ order: -1 });
     const order = lastLink?.order != null ? lastLink.order + 1 : 0;
     
+    // Generate a short code
+    const shortCode = nanoid(8);
+    
     const link = new Link({
       userId: req.user.userId,
       title,
       url,
+      originalUrl: url,
+      shortUrl: `${process.env.BASE_URL || 'http://localhost:3000'}/l/${shortCode}`,
+      shortCode,
       icon,
       backgroundColor,
       textColor,
@@ -56,7 +67,7 @@ router.post('/', auth, async (req: AuthRequest, res) => {
       // In the rare case of a duplicate shortCode, retry with a new one
       return res.status(500).json({ error: 'Please try again' });
     }
-    res.status(400).json({ error: 'Failed to create link' });
+    res.status(400).json({ error: 'Failed to create link: ' + err.message });
   }
 });
 
@@ -122,10 +133,12 @@ router.post('/reorder', auth, async (req: AuthRequest, res) => {
     res.status(500).json({ error: 'Failed to reorder links' });
   }
 });
-// Increment click count for a link
+
+// Increment click count and store click analytics for a link
 router.post('/:id/clicks', async (req, res) => {
   try {
     const { id } = req.params;
+    const { referrer, device, browser, location } = req.body;
 
     if (!id) {
       return res.status(400).json({ error: 'Invalid link ID' });
@@ -137,10 +150,29 @@ router.post('/:id/clicks', async (req, res) => {
       return res.status(404).json({ error: 'Link not found' });
     }
 
+    // Initialize clickData array if it doesn't exist
+    if (!link.clickData) {
+      link.clickData = [];
+    }
+
+    // Add new click data
+    link.clickData.push({
+      timestamp: new Date().toISOString(),
+      referrer: referrer || 'direct',
+      device: device || 'unknown',
+      browser: browser || 'unknown',
+      location: location || 'unknown'
+    });
+
+    // Increment click count
     link.clicks = (link.clicks || 0) + 1;
     await link.save();
 
-    res.json({ message: 'Click count updated', clicks: link.clicks });
+    res.json({ 
+      message: 'Click data updated', 
+      clicks: link.clicks,
+      clickData: link.clickData 
+    });
   } catch (error) {
     console.error('Error updating clicks:', error);
     res.status(500).json({ error: 'Internal server error' });

@@ -1,77 +1,23 @@
-import axios from 'axios';
+import LinksService from './links';
+import AuthService from './auth';
+import axiosInstance, { API_URL } from './axiosConfig';
 
-// Create axios instance with base URL
-const api = axios.create({
-  baseURL: 'https://mini-link-ddch.onrender.com/api', // Add /api to the base URL
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+console.log('Initializing API services with base URL:', API_URL);
 
-// Add auth token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  console.log('Request Config:', config); // Debug request
-  return config;
-});
+// Create service instances
+export const links = new LinksService(`${API_URL}/links`);
+export const auth = new AuthService(`${API_URL}/auth`);
 
-// Add response interceptor for debugging
-api.interceptors.response.use(
-  (response) => {
-    console.log('API Response:', response);
-    return response;
-  },
-  (error) => {
-    console.error('API Error:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-      url: error.config?.url
-    });
-    return Promise.reject(error);
-  }
-);
-
-export const auth = {
-  login: async (email: string, password: string) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      return response;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
-  },
-  register: async (name: string, email: string, password: string) => {
-    try {
-      const response = await api.post('/auth/register', { name, email, password });
-      return response;
-    } catch (error) {
-      console.error('Register error:', error);
-      throw error;
-    }
-  },
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+// Export a test function to check connectivity
+export const testBackendConnection = async () => {
+  try {
+    const response = await axiosInstance.get('/health');
+    console.log('Backend connection test result:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Backend connection test failed:', error);
+    throw error;
   }
 };
 
-export const links = {
-  create: (linkData: {
-    title: string;
-    url: string;
-    backgroundColor?: string;
-    textColor?: string;
-  }) => api.post('/links', linkData),
-  
-  getAll: () => api.get('/links'),
-  delete: (id: string) => api.delete(`/links/${id}`),
-  incrementClicks: (id: string) => api.post(`/links/${id}/clicks`),
-  reorder: (linkIds: string[]) => api.post('/links/reorder', { linkIds })
-};
-
-export default api; 
+export default axiosInstance; 

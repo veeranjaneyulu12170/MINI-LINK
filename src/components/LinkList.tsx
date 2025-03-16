@@ -177,8 +177,8 @@ const LinkList: React.FC<LinkListProps> = ({ links: linksList, updateLinks, dele
                         backgroundColor: link.backgroundColor || '#ffffff',
                         ...provided.draggableProps.style
                       }}
-                      className="relative flex items-center p-4 rounded-lg shadow-sm border border-gray-200 group"
-                    >
+                      className="relative flex items-center p-4 rounded-lg shadow-sm border border-gray-200 group ml-0 md:ml-4 lg:ml-[300px]"
+                      >
                       <div
                         {...provided.dragHandleProps}
                         className="mr-3 text-gray-400 hover:text-gray-600"

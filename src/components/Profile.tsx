@@ -5,7 +5,7 @@ import { User, Link as LinkType } from '../types';
 
 import { 
   Camera, Mail, User as UserIcon, Link as LinkIcon, Calendar,
-  Activity, BarChart2, Clock, Award, Zap, Share2
+  Activity, BarChart2, Clock, Award, Zap, Share2, Edit2, Save
 } from 'lucide-react';
 
 interface ProfileProps {
@@ -17,9 +17,10 @@ interface ProfileProps {
 
 const Profile: React.FC<ProfileProps> = ({ user, updateUser, links }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(user.name || '');
-  const [bio, setBio] = useState(user.bio || '');
-  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || '');
+  const [editedUser, setEditedUser] = useState<User>(user);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [totalClicks, setTotalClicks] = useState(0);
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
@@ -40,15 +41,90 @@ const Profile: React.FC<ProfileProps> = ({ user, updateUser, links }) => {
     setRecentActivity(activity);
   }, [links]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateUser({
-      ...user,
-      name,
-      bio,
-      avatarUrl
-    });
+  const getCategoryLabel = (categoryId: string) => {
+    const categories = {
+      'business': 'Business',
+      'creative': 'Creative',
+      'education': 'Education',
+      'entertainment': 'Entertainment',
+      'fashion': 'Fashion & Beauty',
+      'food': 'Food & Beverage',
+      'government': 'Government & Politics',
+      'health': 'Health & Wellness',
+      'nonprofit': 'Non-Profit',
+      'tech': 'Tech',
+      'travel': 'Travel & Tourism',
+      'other': 'Other'
+    };
+    
+    return categories[categoryId as keyof typeof categories] || categoryId;
+  };
+
+  const getCategoryIcon = (categoryId: string) => {
+    const icons = {
+      'business': '💼',
+      'creative': '🎨',
+      'education': '📚',
+      'entertainment': '🎬',
+      'fashion': '👗',
+      'food': '🍔',
+      'government': '🏛️',
+      'health': '🧘',
+      'nonprofit': '🤝',
+      'tech': '💻',
+      'travel': '✈️',
+      'other': '🔍'
+    };
+    
+    return icons[categoryId as keyof typeof icons] || '📋';
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditedUser(user);
+    setError('');
+    setSuccess('');
+  };
+
+  const handleCancel = () => {
     setIsEditing(false);
+    setEditedUser(user);
+    setError('');
+    setSuccess('');
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditedUser(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      // In a real application, you would make an API call to update the user profile
+      // For now, we'll just update the local state
+      
+      // Update user in localStorage
+      localStorage.setItem('user', JSON.stringify(editedUser));
+      
+      // Update user in parent component
+      updateUser(editedUser);
+
+      setSuccess('Profile updated successfully');
+      setIsEditing(false);
+    } catch (err: any) {
+      console.error('Profile update error:', err);
+      setError(err.message || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -99,8 +175,8 @@ const Profile: React.FC<ProfileProps> = ({ user, updateUser, links }) => {
             <div className="flex items-center space-x-6">
               <div className="relative">
                 <img
-                  src={avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${name}`}
-                  alt={name}
+                  src={editedUser.avatarUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${editedUser.name}`}
+                  alt={editedUser.name}
                   className="w-24 h-24 rounded-full border-4 border-white shadow-lg"
                 />
                 {isEditing && (
@@ -110,26 +186,27 @@ const Profile: React.FC<ProfileProps> = ({ user, updateUser, links }) => {
                 )}
               </div>
               <div>
-                <h1 className="text-2xl font-bold">{name}</h1>
+                <h1 className="text-2xl font-bold">{editedUser.name}</h1>
                 <p className="flex items-center mt-1 text-indigo-100">
                   <Mail className="w-4 h-4 mr-2" />
-                  {user.email}
+                  {editedUser.email}
                 </p>
-                {bio && !isEditing && (
-                  <p className="mt-2 text-indigo-100 max-w-2xl">{bio}</p>
+                {editedUser.bio && !isEditing && (
+                  <p className="mt-2 text-indigo-100 max-w-2xl">{editedUser.bio}</p>
                 )}
               </div>
             </div>
             {!isEditing ? (
               <button
-                onClick={() => setIsEditing(true)}
+                onClick={handleEdit}
                 className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors"
               >
+                <Edit2 size={18} className="mr-2" />
                 Edit Profile
               </button>
             ) : (
               <button
-                onClick={() => setIsEditing(false)}
+                onClick={handleCancel}
                 className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm transition-colors"
               >
                 Cancel
@@ -247,6 +324,18 @@ const Profile: React.FC<ProfileProps> = ({ user, updateUser, links }) => {
       {/* Edit Profile Form */}
       {isEditing && (
         <div className="bg-white rounded-xl shadow-sm p-6">
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+          
+          {success && (
+            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+              {success}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -254,8 +343,9 @@ const Profile: React.FC<ProfileProps> = ({ user, updateUser, links }) => {
               </label>
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={editedUser.name || ''}
+                onChange={handleChange}
+                name="name"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -264,19 +354,65 @@ const Profile: React.FC<ProfileProps> = ({ user, updateUser, links }) => {
                 Bio
               </label>
               <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
+                value={editedUser.bio || ''}
+                onChange={handleChange}
+                name="bio"
                 rows={4}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 resize-none"
                 placeholder="Tell us about yourself..."
               />
             </div>
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={editedUser.email || ''}
+                onChange={handleChange}
+                name="email"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                disabled
+              />
+              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <select
+                value={editedUser.category || ''}
+                onChange={handleChange}
+                name="category"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">Select a category</option>
+                <option value="business">Business</option>
+                <option value="creative">Creative</option>
+                <option value="education">Education</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="fashion">Fashion & Beauty</option>
+                <option value="food">Food & Beverage</option>
+                <option value="government">Government & Politics</option>
+                <option value="health">Health & Wellness</option>
+                <option value="nonprofit">Non-Profit</option>
+                <option value="tech">Tech</option>
+                <option value="travel">Travel & Tourism</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
               <button
                 type="submit"
+                disabled={loading}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
               >
-                Save Changes
+                {loading ? 'Saving...' : (
+                  <>
+                    <Save size={18} className="mr-2" />
+                    Save Changes
+                  </>
+                )}
               </button>
             </div>
           </form>

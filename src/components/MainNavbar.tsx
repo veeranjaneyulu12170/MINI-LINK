@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LinkIcon, Menu, X } from 'lucide-react';
 import { User } from '../types';
+import Logo from './Logo';
 
 interface MainNavbarProps {
   user: User | null;
@@ -38,9 +39,8 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ user, onLogout }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <LinkIcon className="h-8 w-8 text-indigo-600" />
-            <Link to="/" className="ml-2 text-2xl font-bold text-gray-900">
-              MiniLink
+            <Link to="/" className="flex items-center">
+              <Logo size="medium" />
             </Link>
           </div>
 

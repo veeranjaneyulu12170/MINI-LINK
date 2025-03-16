@@ -12,6 +12,7 @@ import {
   Menu,
   X
 } from "lucide-react";
+import Logo from './Logo';
 
 interface NavbarProps {
   activeTab: string;
@@ -43,19 +44,17 @@ const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, links, onLogou
       {/* Mobile Logo */}
       <div className="md:hidden fixed top-4 left-0 right-0 flex justify-center z-40">
         <div className="flex items-center">
-          <LinkIcon className="h-6 w-6 mr-2 text-indigo-700" />
-          <h1 className="text-xl font-bold text-indigo-700">MiniLink</h1>
+          <Logo />
         </div>
       </div>
 
       {/* Sidebar - Desktop: Always visible, Mobile: Conditional */}
-      <div className={`fixed left-0 top-0 h-screen bg-indigo-700 text-white flex flex-col p-4 overflow-y-auto shadow-lg transition-all duration-300 ease-in-out z-40
+      <div className={`fixed left-0 top-0 h-screen bg-gray-400 text-white flex flex-col p-4 overflow-y-auto shadow-lg transition-all duration-300 ease-in-out z-40
         ${isMobileMenuOpen ? 'w-64' : 'w-0 md:w-64'}`}>
         
         {/* Logo */}
         <div className="flex items-center mb-8 mt-[60px]">
-          <LinkIcon className={`h-6 w-6 mr-2 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`} />
-          <h1 className={`text-xl font-bold transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>MiniLink</h1>
+          <Logo className={`h-6 w-6 mr-2 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 md:opacity-100'}`} />
         </div>
 
         {/* Dashboard Section */}

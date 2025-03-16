@@ -7,6 +7,10 @@ import LandingPage from './components/LandingPage';
 import MainApp from './components/MainApp';
 import MainNavbar from './components/MainNavbar';
 import { useLocation } from 'react-router-dom';
+import GoogleCallback from './components/GoogleCallback';
+import ProfileSetup from './components/ProfileSetup';
+import { ProfileProvider } from './context/ProfileContext';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -36,19 +40,25 @@ function App() {
   const AppContent = () => {
     const location = useLocation();
     const isLoginPage = location.pathname === '/login';
+    const isCallbackPage = location.pathname.startsWith('/auth/google');
+    const isProfileSetupPage = location.pathname === '/profile-setup';
 
     return (
       <div className="min-h-screen bg-gray-50">
-        {!isLoginPage && <MainNavbar user={user} onLogout={handleLogout} />}
-        <div className={isLoginPage ? '' : 'pt-16'}>
+        {!isLoginPage && !isCallbackPage && !isProfileSetupPage && <MainNavbar user={user} onLogout={handleLogout} />}
+        <div className={isLoginPage || isCallbackPage || isProfileSetupPage ? '' : 'pt-16'}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={
               user ? <Navigate to="/app" /> : <Login setUser={setUser} setActiveTab={() => {}} />
             } />
+            <Route path="/profile-setup" element={
+              user ? <ProfileSetup user={user} updateUser={setUser} /> : <Navigate to="/login" />
+            } />
             <Route path="/app/*" element={
               user ? <MainApp user={user} setUser={setUser} /> : <Navigate to="/login" />
             } />
+            <Route path="/auth/google/callback" element={<GoogleCallback />} />
           </Routes>
         </div>
       </div>
@@ -56,9 +66,13 @@ function App() {
   };
 
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <AuthProvider>
+      <ProfileProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </ProfileProvider>
+    </AuthProvider>
   );
 }
 

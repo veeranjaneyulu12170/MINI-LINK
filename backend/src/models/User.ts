@@ -11,6 +11,7 @@ export interface IUser extends mongoose.Document {
   name: string;
   email: string;
   password: string;
+  googleId?: string;
   createdAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
@@ -32,6 +33,11 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters'],
     select: false  // Don't include password by default
+  },
+  googleId: {
+    type: String,
+    sparse: true,
+    unique: true
   },
   createdAt: { 
     type: Date, 

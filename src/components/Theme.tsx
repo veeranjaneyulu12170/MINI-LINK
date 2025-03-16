@@ -7,13 +7,20 @@ import {
   Type,
   Image as ImageIcon,
   User as UserIcon,
+  LayoutList,
+  Grid,
+  ScrollText
 } from "lucide-react";
 import { useAppearance } from '../context/AppearanceContext';
+import { useProfile } from '../context/ProfileContext';
 
 // Define valid theme options
 type ThemeOption = {
-  name: 'default' | 'dark' | 'light' | 'gradient' | 'minimal' | 'colorful';
-  classes: string;
+  name: string;
+  background: string;
+  textColor: string;
+  preview: string;
+  description?: string;
 };
 
 type ButtonOption = {
@@ -31,20 +38,81 @@ type BannerOption = {
   classes: string;
 };
 
+// Update the FontOption type to include more fonts
 type FontOption = {
-  name: 'modern' | 'classic' | 'playful';
+  name: 'modern' | 'classic' | 'playful' | 'elegant' | 'minimal' | 'bold' | 'quirky' | 'tech';
   class: string;
+  preview: string;
 };
 
+// Add these new type definitions at the top with other types
+type LayoutOption = {
+  name: 'stack' | 'grid' | 'carousel';
+  preview: JSX.Element;
+};
+
+// Add these new types and state
+type ButtonStyle = 'fill' | 'outline' | 'hard-shadow' | 'soft-shadow';
+
 // Update the mapped arrays with proper typing
-const themeOptions: Array<{ name: ThemeOption['name']; icon: JSX.Element }> = [
-  { name: 'default', icon: <div className="h-6 w-6 rounded-full bg-white border border-gray-300"></div> },
-  { name: 'dark', icon: <div className="h-6 w-6 rounded-full bg-gray-900 border border-gray-700"></div> },
-  { name: 'light', icon: <div className="h-6 w-6 rounded-full bg-blue-50 border border-blue-200"></div> },
-  { name: 'gradient', icon: <div className="h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600"></div> },
-  { name: 'minimal', icon: <div className="h-6 w-6 rounded-full bg-gray-50 border border-gray-200"></div> },
-  { name: 'colorful', icon: <div className="h-6 w-6 rounded-full bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500"></div> }
-] as const;
+const themeOptions: ThemeOption[] = [
+  { 
+    name: 'Light',
+    background: 'bg-white',
+    textColor: 'text-gray-900',
+    preview: 'bg-white border border-gray-200',
+    description: 'Clean & minimal'
+  },
+  { 
+    name: 'Dark',
+    background: 'bg-gray-900',
+    textColor: 'text-white',
+    preview: 'bg-gray-900',
+    description: 'Bold & elegant'
+  },
+  { 
+    name: 'Minimal',
+    background: 'bg-gray-50',
+    textColor: 'text-gray-800',
+    preview: 'bg-gray-50 border border-gray-200',
+    description: 'Simple & clean'
+  },
+  { 
+    name: 'Ocean',
+    background: 'bg-gradient-to-br from-blue-400 to-blue-600',
+    textColor: 'text-white',
+    preview: 'bg-gradient-to-br from-blue-400 to-blue-600',
+    description: 'Deep & calming'
+  },
+  { 
+    name: 'Sunset',
+    background: 'bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500',
+    textColor: 'text-white',
+    preview: 'bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500',
+    description: 'Warm & vibrant'
+  },
+  { 
+    name: 'Forest',
+    background: 'bg-gradient-to-br from-green-400 to-emerald-600',
+    textColor: 'text-white',
+    preview: 'bg-gradient-to-br from-green-400 to-emerald-600',
+    description: 'Natural & fresh'
+  },
+  { 
+    name: 'Royal',
+    background: 'bg-gradient-to-r from-purple-500 to-indigo-600',
+    textColor: 'text-white',
+    preview: 'bg-gradient-to-r from-purple-500 to-indigo-600',
+    description: 'Rich & luxurious'
+  },
+  { 
+    name: 'Midnight',
+    background: 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900',
+    textColor: 'text-white',
+    preview: 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900',
+    description: 'Dark & mysterious'
+  }
+];
 
 const buttonOptions: Array<{ name: ButtonOption['name']; preview: JSX.Element }> = [
   { name: 'rounded', preview: <div className="h-6 w-12 bg-indigo-500 rounded-lg"></div> },
@@ -68,24 +136,123 @@ const bannerOptions: Array<{ name: BannerOption['name']; preview: JSX.Element }>
   { name: 'none', preview: <div className="h-4 w-20 bg-transparent border border-gray-300"></div> }
 ] as const;
 
-const fontOptions: Array<{ name: FontOption['name']; class: string }> = [
-  { name: 'modern', class: 'font-sans' },
-  { name: 'classic', class: 'font-serif' },
-  { name: 'playful', class: 'font-mono' }
-] as const;
+// Update the fontOptions array with more options
+const fontOptions: Array<FontOption> = [
+  { 
+    name: 'modern', 
+    class: 'font-sans', 
+    preview: 'DM Sans'
+  },
+  { 
+    name: 'classic', 
+    class: 'font-serif', 
+    preview: 'Merriweather'
+  },
+  { 
+    name: 'playful', 
+    class: 'font-comic', 
+    preview: 'Comic Sans'
+  },
+  { 
+    name: 'elegant', 
+    class: 'font-playfair', 
+    preview: 'Playfair'
+  },
+  { 
+    name: 'minimal', 
+    class: 'font-inter', 
+    preview: 'Inter'
+  },
+  { 
+    name: 'bold', 
+    class: 'font-poppins', 
+    preview: 'Poppins'
+  },
+  { 
+    name: 'quirky', 
+    class: 'font-caveat', 
+    preview: 'Caveat'
+  },
+  { 
+    name: 'tech', 
+    class: 'font-roboto-mono', 
+    preview: 'Roboto Mono'
+  }
+];
+
+// Update the layoutOptions array to match the image design
+const layoutOptions: Array<{ name: LayoutOption['name']; preview: JSX.Element }> = [
+  { 
+    name: 'stack', 
+    preview: (
+      <div className="w-full h-full bg-white border-2 border-gray-200 rounded-lg p-2 flex items-center justify-center">
+        <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
+          <path d="M3 13h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V7H3v2z"/>
+        </svg>
+      </div>
+    )
+  },
+  { 
+    name: 'grid', 
+    preview: (
+      <div className="w-full h-full bg-white border-2 border-gray-200 rounded-lg p-2 flex items-center justify-center">
+        <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
+          <path d="M3 3h7v7H3zm11 0h7v7h-7zm0 11h7v7h-7zM3 14h7v7H3z"/>
+        </svg>
+      </div>
+    )
+  },
+  { 
+    name: 'carousel', 
+    preview: (
+      <div className="w-full h-full bg-white border-2 border-gray-200 rounded-lg p-2 flex items-center justify-center">
+        <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
+          <path d="M21 3H3v18h18V3zm-9 14H5V7h7v10zm7 0h-5V7h5v10z"/>
+        </svg>
+      </div>
+    )
+  }
+];
+
+// Update button style options to match the image
+const buttonStyleOptions = [
+  { name: 'fill', preview: (
+    <div className="w-full h-8 bg-black rounded-lg"></div>
+  )},
+  { name: 'outline', preview: (
+    <div className="w-full h-8 border-2 border-black rounded-lg"></div>
+  )},
+  { name: 'hard-shadow', preview: (
+    <div className="w-full h-8 bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"></div>
+  )},
+  { name: 'soft-shadow', preview: (
+    <div className="w-full h-8 bg-white border-2 border-black rounded-lg shadow-lg"></div>
+  )},
+  { name: 'special-1', preview: (
+    <div className="w-full h-8 bg-black rounded-lg" style={{ clipPath: 'polygon(0 0, 100% 0, 95% 100%, 5% 100%)' }}></div>
+  )},
+  { name: 'special-2', preview: (
+    <div className="w-full h-8 bg-black rounded-lg" style={{ clipPath: 'polygon(5% 0, 95% 0, 100% 100%, 0% 100%)' }}></div>
+  )}
+];
 
 const Theme: React.FC = () => {
   const {
     username,
     bio,
     profilePic,
-    setProfilePic,
     bannerImage,
+    addedLinks,
+    shareProfile
+  } = useProfile();
+  
+  const {
+    setProfilePic,
     setBannerImage
   } = useAppearance();
   
   // Theme States with proper typing
-  const [selectedTheme, setSelectedTheme] = useState<ThemeOption['name']>('default');
+  const [selectedTheme, setSelectedTheme] = useState<ThemeOption>(themeOptions[0]);
   const [buttonStyle, setButtonStyle] = useState<ButtonOption['name']>('rounded');
   const [profileStyle, setProfileStyle] = useState<ProfileOption['name']>('circle');
   const [bannerStyle, setBannerStyle] = useState<BannerOption['name']>('full');
@@ -98,51 +265,26 @@ const Theme: React.FC = () => {
   const [bannerClasses, setBannerClasses] = useState("");
   const [fontClasses, setFontClasses] = useState("");
 
+  // Add activeTab state
+  const [activeTab, setActiveTab] = useState<'link' | 'shop'>('link');
+
+  // Add new state for layout
+  const [selectedLayout, setSelectedLayout] = useState<LayoutOption['name']>('stack');
+
+  // Add new state for theme colors and font colors
+  const [fontColor, setFontColor] = useState('#000000');
+  const [selectedFont, setSelectedFont] = useState<FontOption>(fontOptions[0]);
+
+  // Add these to your existing state declarations
+  const [selectedButtonStyle, setSelectedButtonStyle] = useState<ButtonStyle>('fill');
+  const [buttonColor, setButtonColor] = useState('#000000');
+  const [buttonTextColor, setButtonTextColor] = useState('#FFFFFF');
+
   // Update theme classes when selections change
   useEffect(() => {
-    // Theme colors with type assertion
-    const themeMap: Record<ThemeOption['name'], string> = {
-      default: "bg-white border-indigo-500",
-      dark: "bg-gray-900 border-gray-700 text-white",
-      light: "bg-blue-50 border-blue-200",
-      gradient: "bg-gradient-to-br from-indigo-500 to-purple-600 border-purple-500 text-white",
-      minimal: "bg-white border-gray-200",
-      colorful: "bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 border-orange-400 text-white"
-    };
-    
-    const buttonMap: Record<ButtonOption['name'], string> = {
-      rounded: "rounded-lg bg-indigo-500 text-white",
-      square: "rounded-none bg-indigo-500 text-white",
-      pill: "rounded-full bg-indigo-500 text-white",
-      shadow: "rounded-lg bg-indigo-500 text-white shadow-lg shadow-indigo-200",
-      outline: "rounded-lg bg-transparent border-2 border-indigo-500 text-indigo-500",
-      "3d": "rounded-lg bg-indigo-500 text-white transform hover:-translate-y-1 transition-transform shadow-md"
-    };
-    
-    const profileMap: Record<ProfileOption['name'], string> = {
-      circle: "rounded-full",
-      square: "rounded-none",
-      rounded: "rounded-lg"
-    };
-    
-    const bannerMap: Record<BannerOption['name'], string> = {
-      full: "rounded-none",
-      rounded: "rounded-lg",
-      none: "hidden"
-    };
-    
-    const fontMap: Record<FontOption['name'], string> = {
-      modern: "font-sans",
-      classic: "font-serif",
-      playful: "font-mono"
-    };
-
-    setThemeClasses(themeMap[selectedTheme]);
-    setButtonClasses(buttonMap[buttonStyle]);
-    setProfileClasses(profileMap[profileStyle]);
-    setBannerClasses(bannerMap[bannerStyle]);
-    setFontClasses(fontMap[fontStyle]);
-  }, [selectedTheme, buttonStyle, profileStyle, bannerStyle, fontStyle]);
+    // Update theme classes when theme changes
+    setThemeClasses(`${selectedTheme.background} ${selectedTheme.textColor}`);
+  }, [selectedTheme]);
 
   // Handle Image Upload
   const handleImageUpload = (
@@ -151,235 +293,498 @@ const Theme: React.FC = () => {
   ) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      const imageURL = URL.createObjectURL(file);
-      if (type === "profile") setProfilePic(imageURL);
-      else setBannerImage(imageURL);
+      const reader = new FileReader();
+      
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        if (type === "profile") {
+          setProfilePic(base64String);
+        } else {
+          setBannerImage(base64String);
+        }
+      };
+      
+      reader.readAsDataURL(file);
     }
   };
 
-  return (
-    <div className="flex flex-col lg:flex-row gap-8 px-4 lg:px-8">
-      {/* Left Side - Mobile Preview */}
-      <div className="w-full lg:w-[350px] lg:fixed flex-shrink-0">
-        <div className="lg:sticky lg:top-8">
-          <div className={`rounded-[30px] h-[450px] shadow-[10px_10px_10px_rgba(0,0,0,0.5)] p-4 border-2 aspect-[9/18] relative overflow-hidden transition-colors duration-300 ${themeClasses}`}>
-            {/* Banner Image */}
-            <div className={`relative w-full h-24 bg-gray-200 overflow-hidden flex items-center justify-center ${bannerClasses}`}>
-              {bannerImage && bannerStyle !== 'none' ? (
-                <img src={bannerImage} alt="Banner" className="w-full h-full object-cover" />
-              ) : (
-                <span className={selectedTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>
-                  {bannerStyle === 'none' ? '' : 'No Banner'}
-                </span>
-              )}
-              {/* Three Dots Menu */}
-              <button
-                className={`absolute top-2 right-4 scale-75 ${buttonClasses}`}
-                onClick={() => {}}
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </button>
-            </div>
+  // Update the links section in the mobile preview to use the selected layout
+  const renderLinks = () => {
+    const filteredLinks = addedLinks.filter(link => activeTab === 'shop' ? link.isShop : !link.isShop);
+    
+    const getLinkClasses = () => {
+      switch (selectedLayout) {
+        case 'grid':
+          return "bg-gray-100 rounded-lg p-2 flex flex-col items-center h-full";
+        case 'carousel':
+          return "bg-gray-100 rounded-lg p-2 flex-shrink-0 w-[200px] flex flex-col items-center";
+        default: // stack
+          return "bg-gray-100 rounded-lg p-2 flex items-center space-x-2";
+      }
+    };
 
-            {/* Profile Section */}
-            <div className="absolute top-[4.5rem] left-1/2 transform -translate-x-1/2 flex flex-col items-center w-full">
-              {/* Profile Picture */}
-              <label htmlFor="profilePicInputRight" className="cursor-pointer">
-                <input
-                  type="file"
-                  id="profilePicInputRight"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleImageUpload(e, "profile")}
-                />
-                <div className={`w-20 h-20 bg-blue-200 overflow-hidden border-4 ${
-                  selectedTheme === 'dark' ? 'border-gray-700' : 'border-white'
-                } ${profileClasses}`}>
-                  {profilePic ? (
-                    <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+    const getIconClasses = () => {
+      switch (selectedLayout) {
+        case 'grid':
+          return "w-10 h-10 mb-2";
+        case 'carousel':
+          return "w-10 h-10 mb-2";
+        default: // stack
+          return "w-8 h-8";
+      }
+    };
+
+    const getTextClasses = () => {
+      switch (selectedLayout) {
+        case 'grid':
+          return "text-center w-full text-xs font-medium text-gray-900 line-clamp-2";
+        case 'carousel':
+          return "text-center w-full text-xs font-medium text-gray-900 line-clamp-2";
+        default: // stack
+          return "text-xs font-medium text-gray-900 truncate";
+      }
+    };
+
+    switch (selectedLayout) {
+      case 'grid':
+        return (
+          <div className="grid grid-cols-2 gap-2">
+            {filteredLinks.map((link, index) => (
+              <div key={index} className={getLinkClasses()}>
+                <div className={`${getIconClasses()} ${
+                  link.isShop ? 'bg-green-600' : 
+                  link.title.toLowerCase().includes('youtube') ? 'bg-red-600' :
+                  link.title.toLowerCase().includes('instagram') ? 'bg-gradient-to-tr from-purple-500 to-pink-500' :
+                  'bg-blue-600'
+                } rounded-lg flex items-center justify-center`}>
+                  {link.isShop ? (
+                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M13 12h7v1.5h-7m0-4h7V11h-7m0 3.5h7V16h-7m8-12H3a2 2 0 00-2 2v13a2 2 0 002 2h18a2 2 0 002-2V6a2 2 0 00-2-2m0 15h-9V6h9v13Z" />
+                    </svg>
                   ) : (
-                    <span className="text-3xl flex items-center justify-center h-full">@</span>
+                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                    </svg>
                   )}
                 </div>
-              </label>
+                <div className="flex-1 min-w-0">
+                  <p className={getTextClasses()}>{link.title}</p>
+                </div>
+                {link.isShop && (
+                  <button 
+                    onClick={() => window.open(link.url, '_blank')}
+                    className="mt-2 px-3 py-1 bg-green-600 text-white text-[10px] rounded-full hover:bg-green-700 transition-colors"
+                  >
+                    Buy Now
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        );
 
-              {/* Username & Bio */}
-              <h2 className={`text-sm font-semibold cursor-pointer mt-2 text-center w-full ${fontClasses}`}>
-                {username}
-              </h2>
-              <p className={`${
-                selectedTheme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-              } text-sm cursor-pointer text-center w-full break-words max-w-[250px] ${fontClasses}`}>
-                {bio}
-              </p>
-            </div>
-            
-            {/* Demo Buttons */}
-            <div className="absolute bottom-16 left-0 right-0 flex justify-center space-x-2">
-              <button className={`px-3 py-1 text-sm ${buttonClasses}`}>
-                Follow
+      case 'carousel':
+        return (
+          <div className="flex overflow-x-auto space-x-2 pb-2 scrollbar-hide">
+            {filteredLinks.map((link, index) => (
+              <div key={index} className={getLinkClasses()}>
+                <div className={`${getIconClasses()} ${
+                  link.isShop ? 'bg-green-600' : 
+                  link.title.toLowerCase().includes('youtube') ? 'bg-red-600' :
+                  link.title.toLowerCase().includes('instagram') ? 'bg-gradient-to-tr from-purple-500 to-pink-500' :
+                  'bg-blue-600'
+                } rounded-lg flex items-center justify-center`}>
+                  {link.isShop ? (
+                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M13 12h7v1.5h-7m0-4h7V11h-7m0 3.5h7V16h-7m8-12H3a2 2 0 00-2 2v13a2 2 0 002 2h18a2 2 0 002-2V6a2 2 0 00-2-2m0 15h-9V6h9v13Z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                    </svg>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={getTextClasses()}>{link.title}</p>
+                </div>
+                {link.isShop && (
+                  <button 
+                    onClick={() => window.open(link.url, '_blank')}
+                    className="mt-2 px-3 py-1 bg-green-600 text-white text-[10px] rounded-full hover:bg-green-700 transition-colors"
+                  >
+                    Buy Now
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+
+      default: // stack
+        return (
+          <div className="flex flex-col space-y-2">
+            {filteredLinks.map((link, index) => (
+              <div key={index} className={getLinkClasses()}>
+                <div className={`${getIconClasses()} ${
+                  link.isShop ? 'bg-green-600' : 
+                  link.title.toLowerCase().includes('youtube') ? 'bg-red-600' :
+                  link.title.toLowerCase().includes('instagram') ? 'bg-gradient-to-tr from-purple-500 to-pink-500' :
+                  'bg-blue-600'
+                } rounded-lg flex items-center justify-center`}>
+                  {link.isShop ? (
+                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M13 12h7v1.5h-7m0-4h7V11h-7m0 3.5h7V16h-7m8-12H3a2 2 0 00-2 2v13a2 2 0 002 2h18a2 2 0 002-2V6a2 2 0 00-2-2m0 15h-9V6h9v13Z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                    </svg>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={getTextClasses()}>{link.title}</p>
+                </div>
+                {link.isShop && (
+                  <button 
+                    onClick={() => window.open(link.url, '_blank')}
+                    className="px-2 py-0.5 bg-green-600 text-white text-[10px] rounded-full hover:bg-green-700 transition-colors"
+                  >
+                    Buy
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+    }
+  };
+
+  // Function to get theme classes based on theme name
+  const getThemeClasses = (themeName: string) => {
+    switch (themeName) {
+      case 'Air Snow':
+        return 'bg-white text-gray-900';
+      case 'Air Grey':
+        return 'bg-gray-100 text-gray-900';
+      case 'Air Smoke':
+        return 'bg-gray-800 text-white';
+      case 'Air Black':
+        return 'bg-black text-white';
+      case 'Mineral Blue':
+        return 'bg-blue-50 text-gray-900';
+      case 'Mineral Green':
+        return 'bg-green-50 text-gray-900';
+      case 'Mineral Orange':
+        return 'bg-orange-50 text-gray-900';
+      case 'Mineral Yellow':
+        return 'bg-yellow-50 text-gray-900';
+      default:
+        return 'bg-white text-gray-900';
+    }
+  };
+
+  // Update the Fonts section in the right side editor
+  const FontsSection = () => (
+    <div className="bg-white rounded-xl p-6 mb-6">
+      <h2 className="text-lg font-medium mb-4">Fonts</h2>
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-sm text-gray-500 mb-3">Font</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {fontOptions.map((font) => (
+              <button
+                key={font.name}
+                onClick={() => setSelectedFont(font)}
+                className={`flex items-center space-x-3 p-3 border-2 rounded-lg ${
+                  selectedFont.name === font.name
+                    ? 'border-black bg-black bg-opacity-5'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <span className={`text-2xl ${font.class}`}>Aa</span>
+                <span className="text-sm text-gray-600">{font.preview}</span>
               </button>
-              <button className={`px-3 py-1 text-sm ${buttonClasses}`}>
-                Message
-              </button>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
-
-      {/* Right Side - Theme Editor */}
-      <div className="flex-1 max-w-3xl lg:ml-[350px] border-4 border-indigo-300 p-4 rounded-xl">
-        {/* Banner Image Upload */}
-        <div className="relative w-full h-[120px] bg-gray-200 rounded-lg border-2 border-indigo-300 overflow-hidden mb-6" style={{ aspectRatio: "3 / 1" }}>
-          {bannerImage ? (
-            <img
-              src={bannerImage}
-              alt="Banner"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="flex items-center justify-center w-full h-full text-gray-500">
-              Click to Upload Banner
-            </span>
-          )}
+        <div>
+          <h3 className="text-sm text-gray-500 mb-3">Color</h3>
           <input
-            type="file"
-            accept="image/*"
-            className="absolute inset-0 opacity-0 cursor-pointer"
-            onChange={(e) => handleImageUpload(e, "banner")}
+            type="color"
+            value={fontColor}
+            onChange={(e) => setFontColor(e.target.value)}
+            className="w-32 h-12 rounded-lg cursor-pointer"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  // Update the Themes section
+  const ThemesSection = () => (
+    <div className="bg-white rounded-xl p-6">
+      <h2 className="text-lg font-medium mb-4">Themes</h2>
+      <div className="grid grid-cols-4 gap-4">
+        {themeOptions.map((theme) => (
+          <button
+            key={theme.name}
+            onClick={() => setSelectedTheme(theme)}
+            className={`group flex flex-col items-center bg-white rounded-xl p-4 transition-all ${
+              selectedTheme.name === theme.name
+                ? 'ring-2 ring-black ring-offset-2'
+                : 'border-2 border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            {/* Theme Preview */}
+            <div className={`w-full aspect-square ${theme.preview} rounded-lg mb-3 shadow-sm group-hover:shadow-md transition-shadow`}>
+              {/* Preview Content */}
+              <div className="w-full h-full flex flex-col items-center justify-center p-3">
+                <div className={`w-8 h-2 ${theme.textColor} opacity-60 rounded-full mb-1`}></div>
+                <div className={`w-6 h-2 ${theme.textColor} opacity-60 rounded-full`}></div>
+              </div>
+            </div>
+            {/* Theme Name and Description */}
+            <span className="text-sm font-medium text-gray-900">{theme.name}</span>
+            {theme.description && (
+              <span className="text-xs text-gray-500 mt-1">{theme.description}</span>
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Add this function to get button styles
+  const getButtonStyles = (style: ButtonStyle) => {
+    switch (style) {
+      case 'fill':
+        return `bg-[${buttonColor}] text-[${buttonTextColor}] hover:opacity-90`;
+      case 'outline':
+        return `border-2 border-[${buttonColor}] text-[${buttonColor}] bg-transparent hover:bg-[${buttonColor}] hover:text-[${buttonTextColor}]`;
+      case 'hard-shadow':
+        return `bg-[${buttonColor}] text-[${buttonTextColor}] shadow-[4px_4px_0px_0px_rgba(0,0,0,0.25)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.25)]`;
+      case 'soft-shadow':
+        return `bg-[${buttonColor}] text-[${buttonTextColor}] shadow-lg hover:shadow-md`;
+      default:
+        return `bg-[${buttonColor}] text-[${buttonTextColor}]`;
+    }
+  };
+
+  // Update the Buttons section in your right side editor
+  const ButtonsSection = () => (
+    <>
+      <div className="bg-white rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-medium mb-4">Buttons</h2>
+        
+        {/* Fill */}
+        <div className="mb-6">
+          <h3 className="text-sm text-gray-500 mb-3">Fill</h3>
+          <button
+            onClick={() => setSelectedButtonStyle('fill')}
+            className={`w-full h-12 rounded-lg transition-all ${
+              selectedButtonStyle === 'fill' 
+                ? 'ring-2 ring-black ring-offset-2' 
+                : ''
+            }`}
+            style={{ backgroundColor: buttonColor }}
           />
         </div>
 
-        {/* Profile Picture Upload */}
-        <div className="mb-6 flex items-center">
-          <label htmlFor="profilePicEditor" className="cursor-pointer">
-            <input
-              type="file"
-              id="profilePicEditor"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => handleImageUpload(e, "profile")}
-            />
-            <div className="w-16 h-16 bg-blue-200 rounded-full overflow-hidden border-2 border-indigo-300 mr-4">
-              {profilePic ? (
-                <img
-                  src={profilePic}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
+        {/* Outline */}
+        <div className="mb-6">
+          <h3 className="text-sm text-gray-500 mb-3">Outline</h3>
+          <button
+            onClick={() => setSelectedButtonStyle('outline')}
+            className={`w-full h-12 rounded-lg border-2 transition-all ${
+              selectedButtonStyle === 'outline'
+                ? 'ring-2 ring-black ring-offset-2'
+                : ''
+            }`}
+            style={{ borderColor: buttonColor, color: buttonColor }}
+          />
+        </div>
+
+        {/* Hard shadow */}
+        <div className="mb-6">
+          <h3 className="text-sm text-gray-500 mb-3">Hard shadow</h3>
+          <button
+            onClick={() => setSelectedButtonStyle('hard-shadow')}
+            className={`w-full h-12 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,0.25)] transition-all ${
+              selectedButtonStyle === 'hard-shadow'
+                ? 'ring-2 ring-black ring-offset-2'
+                : ''
+            }`}
+            style={{ backgroundColor: buttonColor }}
+          />
+        </div>
+
+        {/* Soft shadow */}
+        <div>
+          <h3 className="text-sm text-gray-500 mb-3">Soft shadow</h3>
+          <button
+            onClick={() => setSelectedButtonStyle('soft-shadow')}
+            className={`w-full h-12 rounded-lg shadow-lg transition-all ${
+              selectedButtonStyle === 'soft-shadow'
+                ? 'ring-2 ring-black ring-offset-2'
+                : ''
+            }`}
+            style={{ backgroundColor: buttonColor }}
+          />
+        </div>
+      </div>
+
+      {/* Button Color */}
+      <div className="bg-white rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-medium mb-4">Button color</h2>
+        <input
+          type="color"
+          value={buttonColor}
+          onChange={(e) => setButtonColor(e.target.value)}
+          className="w-32 h-12 rounded-lg cursor-pointer"
+        />
+      </div>
+
+      {/* Button Font Color */}
+      <div className="bg-white rounded-xl p-6 mb-6">
+        <h2 className="text-lg font-medium mb-4">Button font color</h2>
+        <input
+          type="color"
+          value={buttonTextColor}
+          onChange={(e) => setButtonTextColor(e.target.value)}
+          className="w-32 h-12 rounded-lg cursor-pointer"
+        />
+      </div>
+    </>
+  );
+
+  // Update the Get Connected button in your mobile preview
+  const GetConnectedButton = () => (
+    <button 
+      className={`w-full py-1.5 rounded-lg text-xs font-medium transition-all ${getButtonStyles(selectedButtonStyle)}`}
+      onClick={() => {
+        window.open(`https://yourwebsite.com/${username}`, '_blank');
+      }}
+      style={{
+        backgroundColor: selectedButtonStyle === 'outline' ? 'transparent' : buttonColor,
+        color: selectedButtonStyle === 'outline' ? buttonColor : buttonTextColor,
+        borderColor: selectedButtonStyle === 'outline' ? buttonColor : 'transparent'
+      }}
+    >
+      Get Connected
+    </button>
+  );
+
+  return (
+    <div className="flex flex-col lg:flex-row gap-8 px-4 lg:px-8">
+      {/* Left Side - Mobile Preview - Keep exactly as is */}
+      <div className="w-full lg:w-[350px] lg:fixed lg:flex-shrink-0 mb-8 lg:mb-0">
+        <div className="lg:sticky top-8 flex justify-center lg:justify-start">
+          <div className={`bg-white rounded-[30px] h-[450px] shadow-[10px_10px_10px_rgba(0,0,0,0.5)] p-4 border-2 border-gray-200 aspect-[9/18] relative overflow-hidden ${themeClasses} ${selectedFont.class}`}>
+            {/* Keep all existing mobile preview code unchanged */}
+            {/* Share Button */}
+            <button
+              onClick={shareProfile}
+              className={`absolute top-4 right-4 z-10 ${
+                selectedTheme.textColor === 'text-white' 
+                  ? 'bg-white/20 backdrop-blur-sm hover:bg-white/30' 
+                  : 'bg-black/10 backdrop-blur-sm hover:bg-black/20'
+              } p-2 rounded-full shadow-md transition-colors`}
+            >
+              <Share2 className={`w-5 h-5 ${selectedTheme.textColor}`} />
+            </button>
+
+            {/* Banner Image */}
+            <div className={`relative w-full h-24 bg-gray-200 overflow-hidden ${bannerClasses}`}>
+              {bannerImage ? (
+                <img src={bannerImage} alt="Banner" className="w-full h-full object-cover" />
               ) : (
-                <span className="text-2xl flex items-center justify-center h-full">
-                  @
-                </span>
+                <div className="w-full h-full bg-gradient-to-r from-gray-100 to-gray-200" />
               )}
             </div>
-          </label>
-          <div>
-            <h3 className="font-semibold">{username}</h3>
-            <p className="text-sm text-gray-500">Click image to update profile picture</p>
-          </div>
-        </div>
 
-        {/* Theme Settings Section */}
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4">Theme Settings</h2>
-          
-          {/* Color Themes */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3">Color Theme</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {themeOptions.map((theme) => (
+            {/* Profile Section */}
+            <div className="relative -mt-10 flex flex-col items-center">
+              <div className={`w-20 h-20 bg-white overflow-hidden border-4 border-white shadow-lg ${profileClasses}`}>
+                  {profilePic ? (
+                    <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                  <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                    <span className="text-2xl text-gray-400">@</span>
+                  </div>
+                  )}
+                </div>
+              <h2 className={`mt-2 text-lg font-semibold ${fontClasses}`} style={{ color: fontColor }}>{username}</h2>
+              {bio && <p className={`text-sm text-gray-500 text-center mt-1 ${fontClasses}`}>{bio}</p>}
+            </div>
+            
+            {/* Links Section */}
+            <div className="mt-3 space-y-2 overflow-y-auto max-h-[calc(100%-10rem)] px-2">
+              {/* Tabs */}
+              <div className="flex space-x-2 mb-3">
                 <button
-                  key={theme.name}
-                  onClick={() => setSelectedTheme(theme.name)}
-                  className={`p-4 rounded-lg border-2 flex flex-col items-center ${
-                    selectedTheme === theme.name ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium ${
+                    activeTab === 'link'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-600'
                   }`}
-
+                  onClick={() => setActiveTab('link')}
                 >
-                  {theme.icon}
-                  <span className="capitalize mt-2">{theme.name}</span>
+                  Link
+                </button>
+                <button
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium ${
+                    activeTab === 'shop'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                  onClick={() => setActiveTab('shop')}
+                >
+                  Shop
+                </button>
+              </div>
+
+              {/* Links with selected layout */}
+              {renderLinks()}
+
+              {/* Get Connected Button */}
+              <GetConnectedButton />
+            </div>
+          </div>
+            </div>
+          </div>
+
+      {/* Right Side - Theme Editor - Updated Design */}
+      <div className="flex-1 lg:ml-[350px]">
+        {/* Layout Section */}
+        <div className="bg-white rounded-xl p-6 mb-6">
+          <h2 className="text-lg font-medium mb-4">Layout</h2>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { name: 'stack', icon: <LayoutList className="w-6 h-6" /> },
+              { name: 'grid', icon: <Grid className="w-6 h-6" /> },
+              { name: 'carousel', icon: <ScrollText className="w-6 h-6" /> }
+            ].map((layout) => (
+                <button
+                key={layout.name}
+                onClick={() => setSelectedLayout(layout.name as LayoutOption['name'])}
+                className={`aspect-square p-4 flex flex-col items-center justify-center rounded-lg ${
+                  selectedLayout === layout.name 
+                    ? 'bg-black bg-opacity-5 border-2 border-black' 
+                    : 'border-2 border-gray-200'
+                }`}
+              >
+                {layout.icon}
+                <span className="mt-2 text-sm capitalize">{layout.name}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Button Style */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3">Button Style</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {buttonOptions.map((style) => (
-                <button
-                  key={style.name}
-                  onClick={() => setButtonStyle(style.name)}
-                  className={`p-4 rounded-lg border-2 flex flex-col items-center ${
-                    buttonStyle === style.name ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  {style.preview}
-                  <span className="capitalize mt-2">{style.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+        {/* Buttons Section */}
+        <ButtonsSection />
 
-          {/* Profile Picture Style */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3">Profile Picture Style</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {profileOptions.map((style) => (
-                <button
-                  key={style.name}
-                  onClick={() => setProfileStyle(style.name)}
-                  className={`p-4 rounded-lg border-2 flex flex-col items-center ${
-                    profileStyle === style.name ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  {style.preview}
-                  <span className="capitalize mt-2">{style.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Banner Style */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3">Banner Style</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {bannerOptions.map((style) => (
-                <button
-                  key={style.name}
-                  onClick={() => setBannerStyle(style.name)}
-                  className={`p-4 rounded-lg border-2 flex flex-col items-center ${
-                    bannerStyle === style.name ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  {style.preview}
-                  <span className="capitalize mt-2">{style.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Font Style */}
-          <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3">Font Style</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {fontOptions.map((style) => (
-                <button
-                  key={style.name}
-                  onClick={() => setFontStyle(style.name)}
-                  className={`p-4 rounded-lg border-2 flex flex-col items-center ${
-                    fontStyle === style.name ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  <Type className="h-6 w-6 mb-2" />
-                  <span className="capitalize mt-2">{style.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <FontsSection />
+        <ThemesSection />
       </div>
     </div>
   );
