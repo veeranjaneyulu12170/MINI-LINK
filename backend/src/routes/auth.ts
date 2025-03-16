@@ -233,4 +233,77 @@ router.get('/login-test', (req, res) => {
   });
 });
 
+// Add this test route
+router.get('/google/callback-test', (req, res) => {
+  res.status(200).json({ 
+    message: 'Google callback endpoint is accessible',
+    query: req.query
+  });
+});
+
+// Add this route to handle Google token verification
+router.post('/google-token', async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    // Verify the token
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    
+    const payload = ticket.getPayload();
+    if (!payload) {
+      return res.status(400).json({ error: 'Invalid token' });
+    }
+    
+    const { email, name, sub: googleId } = payload;
+    
+    // Check if user exists
+    let user = await UserModel.findOne({ email });
+    
+    if (!user) {
+      // Create new user
+      const hashedPassword = await bcrypt.hash(Math.random().toString(36).slice(-8), 10);
+      
+      user = new UserModel({
+        name: name || email.split('@')[0],
+        email,
+        googleId,
+        password: hashedPassword
+      });
+      
+      await user.save();
+    } else {
+      // Update googleId if not already set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+    }
+    
+    // Create JWT token
+    const jwtToken = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
+    
+    // Send response
+    res.json({
+      token: jwtToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+    
+  } catch (error) {
+    console.error('Google token verification error:', error);
+    res.status(500).json({ error: 'Failed to verify Google token' });
+  }
+});
+
 export default router; 
