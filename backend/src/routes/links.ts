@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { auth, AuthRequest } from '../middleware/auth';
 import Link from '../models/Link';
 import { nanoid } from 'nanoid';
+import { getErrorMessage } from '../utils/errorHandling';
 
 const router = Router();
 
@@ -63,9 +64,9 @@ router.post('/', auth, async (req: AuthRequest, res) => {
     
     const savedLink = await link.save();
     res.status(201).json(savedLink);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating link:', error);
-    res.status(500).json({ error: 'Failed to create link', details: error.message });
+    res.status(500).json({ error: 'Failed to create link', details: getErrorMessage(error) });
   }
 });
 
