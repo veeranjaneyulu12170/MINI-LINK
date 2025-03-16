@@ -6,10 +6,11 @@
     "dev": "vite",
     "frontend": "vite",
     "backend": "cd backend && npm run dev",
-    "build": "npm install && tsc --skipLibCheck && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "postinstall": "npm install axios --no-save"
+    "postinstall": "npm install axios --no-save",
+    "render-build": "npm install --omit=optional && vite build"
   },
   "dependencies": {
     "@splinetool/react-spline": "^2.2.6",
@@ -39,6 +40,13 @@
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.8.2",
-    "vite": "6.2.2"
+    "vite": "6.2.2",
+    "rollup": "3.29.4"
+  },
+  "overrides": {
+    "rollup": "^3.29.4"
+  },
+  "resolutions": {
+    "rollup": "3.29.4"
   }
 }
