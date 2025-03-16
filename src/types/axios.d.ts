@@ -30,10 +30,22 @@ declare module 'axios' {
     toJSON: () => object;
   }
 
+  export interface AxiosInterceptorManager<V> {
+    use(
+      onFulfilled?: (value: V) => V | Promise<V>,
+      onRejected?: (error: any) => any
+    ): number;
+    eject(id: number): void;
+  }
+
   export interface AxiosInstance {
     (config: AxiosRequestConfig): Promise<AxiosResponse>;
     (url: string, config?: AxiosRequestConfig): Promise<AxiosResponse>;
     defaults: AxiosRequestConfig;
+    interceptors: {
+      request: AxiosInterceptorManager<AxiosRequestConfig>;
+      response: AxiosInterceptorManager<AxiosResponse>;
+    };
     get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
     post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
     put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
@@ -43,12 +55,14 @@ declare module 'axios' {
 
   export function create(config?: AxiosRequestConfig): AxiosInstance;
   export function isCancel(value: any): boolean;
+  export function isAxiosError(value: any): value is AxiosError;
   export function all<T>(values: (T | Promise<T>)[]): Promise<T[]>;
   export function spread<T, R>(callback: (...args: T[]) => R): (array: T[]) => R;
 
   const axios: AxiosInstance & {
     create: typeof create;
     isCancel: typeof isCancel;
+    isAxiosError: typeof isAxiosError;
     all: typeof all;
     spread: typeof spread;
   };

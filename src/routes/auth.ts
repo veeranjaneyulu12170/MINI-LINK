@@ -1,4 +1,4 @@
-import * as axios from 'axios';
+import axios from 'axios';
 // OR
-import axios = require('axios');
+// const axios = require('axios');
 // Rest of your code... 
