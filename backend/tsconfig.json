@@ -9,8 +9,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node", "axios"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/types/*.d.ts"],
   "exclude": ["node_modules"]
 } 
