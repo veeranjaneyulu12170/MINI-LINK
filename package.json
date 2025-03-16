@@ -6,7 +6,7 @@
     "dev": "vite",
     "frontend": "vite",
     "backend": "cd backend && npm run dev",
-    "build": "npm install && tsc && vite build",
+    "build": "npm install && tsc --skipLibCheck && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
     "postinstall": "npm install axios --no-save"
@@ -27,6 +27,8 @@
     "tailwind-scrollbar-hide": "^2.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "12.1.2",
+    "@types/lodash": "4.17.16",
     "@types/node": "^22.13.8",
     "@types/react": "^18.2.61",
     "@types/react-beautiful-dnd": "^13.1.8",

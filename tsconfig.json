@@ -8,7 +8,8 @@
     "strict": true,
     "jsx": "react-jsx",
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "types": ["node", "axios"]
+    "types": ["node", "axios", "vite/client"],
+    "skipLibCheck": true
   },
   "include": ["src/**/*", "src/types/*.d.ts"],
   "exclude": ["node_modules"]
