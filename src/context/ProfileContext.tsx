@@ -29,7 +29,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [bio, setBio] = useState(() => localStorage.getItem('bio') || '');
   const [profilePic, setProfilePic] = useState(() => localStorage.getItem('profilePic') || '');
   const [bannerImage, setBannerImage] = useState(() => localStorage.getItem('bannerImage') || '');
-  const [links, setLinks] = useState([]);
+  const [links, setLinks] = useState<any[]>([]);
   const [addedLinks, setAddedLinks] = useState<Link[]>([]);
   const [activeTab, setActiveTab] = useState<'link' | 'shop'>('link');
   const [backgroundColor, setBackgroundColor] = useState(() => 
