@@ -20,7 +20,8 @@
       "@/*": ["src/*"]
     },
     "typeRoots": ["./node_modules/@types", "./src/types"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node", "axios"]
   },
   "include": ["src/**/*", "src/types/*.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
