@@ -200,11 +200,6 @@ export default class AuthService {
 
   // Example Google OAuth initiation
   initiateGoogleLogin = () => {
-    // Use the environment variable for the redirect URI
-    const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI;
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&access_type=offline`;
-    
-    console.log('Redirecting to Google OAuth URL:', googleAuthUrl);
-    window.location.href = googleAuthUrl;
+    window.location.href = `${API_URL}/api/auth/google`;
   };
 } 

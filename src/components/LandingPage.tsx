@@ -304,7 +304,7 @@ const LandingPage: React.FC = () => {
               </ul>
                 </motion.div>
               </Parallax>
-            </div>
+        </div>
       </div>
       </section>
 

@@ -11,6 +11,7 @@ import GoogleCallback from './components/GoogleCallback';
 import ProfileSetup from './components/ProfileSetup';
 import { ProfileProvider } from './context/ProfileContext';
 import { AuthProvider } from './context/AuthContext';
+import AuthCallback from './components/AuthCallback';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -59,6 +60,7 @@ function App() {
               user ? <MainApp user={user} setUser={setUser} /> : <Navigate to="/login" />
             } />
             <Route path="/auth/google/callback" element={<GoogleCallback />} />
+            <Route path="/auth-callback" element={<AuthCallback />} />
           </Routes>
         </div>
       </div>
