@@ -1,4 +1,4 @@
-import axiosInstance from './axiosConfig';
+import axiosInstance, { API_URL } from './axiosConfig';
 import { User, LoginResponse, RegisterResponse, GoogleAuthResponse } from '../types';
 import axios from 'axios';
 
@@ -11,7 +11,11 @@ export default class AuthService {
 
   async login(email: string, password: string): Promise<{ data: LoginResponse }> {
     try {
-      console.log('Attempting login with API URL:', API_URL);
+      console.log('Attempting login with:');
+      console.log('- API_URL:', API_URL);
+      console.log('- this.baseUrl:', this.baseUrl);
+      console.log('- Full URL:', `${this.baseUrl}/login`);
+      
       const response = await axiosInstance.post<LoginResponse>(`${this.baseUrl}/login`, { email, password });
       console.log('Login response:', response.data);
       if (response.data.token) {
@@ -21,6 +25,19 @@ export default class AuthService {
       return response;
     } catch (error) {
       console.error('Login error details:', error);
+      
+      // Add more detailed error logging
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error details:');
+        console.error('- Status:', error.response?.status);
+        console.error('- Data:', error.response?.data);
+        console.error('- Config:', {
+          url: error.config?.url,
+          baseURL: error.config?.baseURL,
+          method: error.config?.method
+        });
+      }
+      
       throw error;
     }
   }

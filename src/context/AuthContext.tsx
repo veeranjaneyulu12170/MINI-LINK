@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import AuthService from '../services/auth';
+import { API_URL } from '../services/axiosConfig';
 
 interface AuthContextType {
   isAuthenticated: boolean;
