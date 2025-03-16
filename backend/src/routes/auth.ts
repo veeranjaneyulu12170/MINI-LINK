@@ -253,8 +253,8 @@ router.post('/google', async (req, res) => {
 });
 
 // Example Google OAuth callback route
-router.get('/auth/google/callback', async (req, res) => {
-  // Handle the callback
+router.get('/google/callback', async (req, res) => {
+  // Handle the OAuth callback
   // ...
 });
 
