@@ -1,6 +1,6 @@
 import axiosInstance from './axiosConfig';
 import { User, LoginResponse, RegisterResponse, GoogleAuthResponse } from '../types';
-
+import axios from 'axios';
 export default class AuthService {
   private baseUrl: string;
 
