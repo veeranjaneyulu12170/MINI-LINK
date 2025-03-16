@@ -1,3 +1,0 @@
-import axios from 'axios';
-
-// Rest of your code... 
