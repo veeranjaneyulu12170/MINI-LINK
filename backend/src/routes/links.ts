@@ -18,6 +18,8 @@ router.get('/', auth, async (req: AuthRequest, res) => {
 
 // Create new link
 router.post('/', auth, async (req: AuthRequest, res) => {
+  console.log('Received link creation request:', req.body);
+  
   try {
     const { title, url, icon, backgroundColor, textColor } = req.body;
     
@@ -61,13 +63,9 @@ router.post('/', auth, async (req: AuthRequest, res) => {
     
     const savedLink = await link.save();
     res.status(201).json(savedLink);
-  } catch (err: any) {
-    console.error('Create link error:', err);
-    if (err.code === 11000) {
-      // In the rare case of a duplicate shortCode, retry with a new one
-      return res.status(500).json({ error: 'Please try again' });
-    }
-    res.status(400).json({ error: 'Failed to create link: ' + err.message });
+  } catch (error) {
+    console.error('Error creating link:', error);
+    res.status(500).json({ error: 'Failed to create link', details: error.message });
   }
 });
 
@@ -177,6 +175,20 @@ router.post('/:id/clicks', async (req, res) => {
     console.error('Error updating clicks:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// Add this route to test links functionality
+router.get('/test', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    message: 'Links endpoint is accessible',
+    routes: {
+      getLinks: '/api/links',
+      createLink: '/api/links',
+      updateLink: '/api/links/:id',
+      deleteLink: '/api/links/:id'
+    }
+  });
 });
 
 export default router; 

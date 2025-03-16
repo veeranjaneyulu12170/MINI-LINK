@@ -242,7 +242,7 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink, user }) => {
 
       console.log("Creating link with data:", linkData);
       
-      // Call the addLink function
+      // Call the updated createLink function
       const newLink = await addLink(linkData);
       console.log("Link created successfully:", newLink);
       
@@ -264,25 +264,15 @@ const LinkForm: React.FC<LinkFormProps> = ({ addLink, deleteLink, user }) => {
         setSuccess("");
       }, 3000);
     } catch (err: any) {
-      console.error('Error creating link:', err);
+      console.error('Failed to create link:', err);
       
-      // Handle network errors specifically
-      if (err.code === 'ERR_NETWORK') {
-        setError("Network error: Cannot connect to the server. Please check your internet connection and try again.");
-      } else if (err.response?.status === 401) {
-        setError("Authentication error: Please log in again.");
-      } else if (err.response?.status === 400) {
-        setError(err.response?.data?.error || "Invalid link data. Please check your input.");
-      } else if (err.message && err.message.includes('validation failed')) {
-        setError("Link validation failed. Please check your input and try again.");
-      } else {
-        setError(err.response?.data?.error || err.message || "Failed to create link");
-      }
-      
-      // Log detailed error information
+      // Add more detailed error logging
       if (err.response?.data) {
         console.error('Server error response:', err.response.data);
       }
+      
+      // Show error message to user
+      setError('Failed to create link. Please try again.');
     } finally {
       setLoading(false);
     }
