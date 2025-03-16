@@ -11,6 +11,12 @@ export default defineConfig({
     }
   },
   build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    // Ensure assets are properly handled
+    assetsInlineLimit: 4096,
+    // Copy the public directory to the output directory
+    copyPublicDir: true,
     rollupOptions: {
       // External dependencies that shouldn't be bundled
       external: [],

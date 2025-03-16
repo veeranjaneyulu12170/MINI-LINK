@@ -122,7 +122,7 @@ const LandingPage: React.FC = () => {
               <motion.div className="relative">
                 <Parallax {...MEDIUM_PARALLAX}>
               <img 
-                src="src/public/images/Analytics 1 1.png" 
+                src="/images/Analytics 1 1.png" 
                 alt="Dashboard preview" 
                 className="rounded-lg shadow-xl"
               />
@@ -149,7 +149,7 @@ const LandingPage: React.FC = () => {
                   shouldAlwaysCompleteAnimation={true}
                 >
               <img 
-                src="src/public/images/div.png" 
+                src="/images/div.png" 
                 alt="Analytics dashboard" 
                 className="rounded-lg shadow-lg"
               />
@@ -228,7 +228,7 @@ const LandingPage: React.FC = () => {
                   scale={[0.85, 1.15]}
                 >
               <img 
-                src="src\public\images\A high-angle perspective, high-resolution stock photo of a modern, minimalistic e-commerce dashboard interface. The UI displays payment systems, pricing tiers, subscription op.jpg" 
+                src="/images/A high-angle perspective, high-resolution stock photo of a modern, minimalistic e-commerce dashboard interface. The UI displays payment systems, pricing tiers, subscription op.jpg" 
                 alt="Payment dashboard" 
                 className="rounded-lg shadow-lg"
               />
@@ -256,7 +256,7 @@ const LandingPage: React.FC = () => {
                   transition={{ duration: 0.6 }}
                 >
               <img 
-                src="src/public/images/gyhn.png" 
+                src="/images/gyhn.png" 
                 alt="Content showcase" 
                     className="rounded-lg shadow-lg hover:shadow-xl transition-shadow"
                   />
@@ -514,28 +514,28 @@ const LandingPage: React.FC = () => {
                   text: "MiniLink has transformed how I share content with my audience. The analytics are incredible!",
                   name: "Sarah Johnson",
                   role: "Content Creator",
-                  avatar: "src/public/images/a1.jpeg",
+                  avatar: "/images/a1.jpeg",
                   gradient: "from-blue-400 to-indigo-500"
                 },
                 {
                   text: "The best link management tool I've ever used. Clean interface and powerful features.",
                   name: "Michael Chen",
                   role: "Digital Marketer",
-                  avatar: "src/public/images/a2.jpeg",
+                  avatar: "/images/a2.jpeg",
                   gradient: "from-green-400 to-emerald-500"
                 },
                 {
                   text: "Integration options are fantastic. I can connect all my platforms seamlessly.",
                   name: "Emily Rodriguez",
                   role: "Social Media Manager",
-                  avatar: "src/public/images/a3.jpeg",
+                  avatar: "/images/a3.jpeg",
                   gradient: "from-purple-400 to-pink-500"
                 },
                 {
                   text: "The analytics insights have helped me understand my audience better than ever.",
                   name: "David Kim",
                   role: "Entrepreneur",
-                  avatar: "src/public/images/a4.jpeg",
+                  avatar: "/images/a4.jpeg",
                   gradient: "from-orange-400 to-red-500"
                 }
               ].map((testimonial, index) => (
