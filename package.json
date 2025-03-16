@@ -6,14 +6,13 @@
     "dev": "vite",
     "frontend": "vite",
     "backend": "cd backend && npm run dev",
-    "build": "npm install && tsc && vite build",
+    "build": "npm cache clean --force && npm install && tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint ."
   },
   "dependencies": {
     "@splinetool/react-spline": "^2.2.6",
-    "@types/axios": "^0.9.36",
-    "axios": "^1.8.3",
+    "axios": "^1.6.7",
     "framer-motion": "^11.0.8",
     "lucide-react": "^0.344.0",
     "mongoose": "^8.11.0",
