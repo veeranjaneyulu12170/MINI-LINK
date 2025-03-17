@@ -28,6 +28,8 @@ export const authorizedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
   'http://localhost:5173',  // Default Vite dev server port
+  'https://mini-link-frontend.onrender.com', // Add your production URL
+  'https://mini-link-ddch.onrender.com',      // Add any other deployment URLs
   // Add your production domains here
   // 'https://your-production-domain.com',
 ];
@@ -53,13 +55,27 @@ export const isAuthorizedOrigin = (): boolean => {
 
 // Get the redirect URI for Google OAuth
 export const getRedirectUri = (): string => {
-  return `${window.location.origin}/auth/google/callback`;
+  const isLocalhost = window.location.hostname === 'localhost' || 
+                      window.location.hostname === '127.0.0.1';
+  
+  if (isLocalhost) {
+    // For local development
+    return `${window.location.origin}/auth/google/callback`;
+  } else {
+    // For production - use the backend URL
+    // This should match what's configured in Google Cloud Console
+    return 'https://mini-link-ddch.onrender.com/api/auth/google/callback';
+  }
 };
 
 // Build the OAuth URL
 export const buildOAuthUrl = (clientId: string, state: string): string => {
   const redirectUri = getRedirectUri();
-  return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=email%20profile&state=${state}`;
+  
+  // Log the full redirect URI for debugging
+  console.log('Full redirect URI:', redirectUri);
+  
+  return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&state=${state}&prompt=select_account`;
 };
 
 // Generate a random state parameter for security
