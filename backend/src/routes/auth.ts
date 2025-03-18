@@ -90,7 +90,7 @@ router.post('/login', async (req, res) => {
 router.get('/google', (req, res) => {
   const googleClientId = process.env.GOOGLE_CLIENT_ID;
   const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = `${process.env.API_URL}/api/auth/google/callback`;
+  const redirectUri = `https://mini-link-ddch.onrender.com/api/auth/google/callback`;
   
   console.log('Initiating Google OAuth flow');
   console.log('Redirect URI:', redirectUri);
