@@ -234,11 +234,131 @@ router.get('/login-test', (req, res) => {
 });
 
 // Add this test route
-router.get('/google/callback-test', (req, res) => {
-  res.status(200).json({ 
-    message: 'Google callback endpoint is accessible',
-    query: req.query
-  });
+router.get('/google/callback', async (req, res) => {
+  try {
+    console.log('Received callback from Google');
+    const code = req.query.code as string;
+    
+    if (!code) {
+      console.error('No code received from Google');
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=google_auth_failed`);
+    }
+    
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const redirectUri = `${process.env.API_URL}/api/auth/google/callback`;
+    
+    console.log('Using redirect URI:', redirectUri);
+    
+    const oauth2Client = new OAuth2Client(
+      googleClientId,
+      googleClientSecret,
+      redirectUri
+    );
+    
+    // Exchange the code for tokens
+    console.log('Exchanging code for tokens');
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+    
+    // Get user info using the access token
+    console.log('Getting user info from Google');
+    const userInfoResponse = await axios.get(
+      'https://www.googleapis.com/oauth2/v2/userinfo',
+      {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`
+        }
+      }
+    );
+    
+    const userInfo = userInfoResponse.data;
+    console.log('User info received:', { 
+      email: userInfo.email,
+      name: userInfo.name
+    });
+    
+    // Check if user exists
+    let user = await UserModel.findOne({ email: userInfo.email });
+    
+    if (!user) {
+      console.log('Creating new user');
+      // Create new user
+      const hashedPassword = await bcrypt.hash(Math.random().toString(36).slice(-8), 10);
+      
+      user = new UserModel({
+        name: userInfo.name || userInfo.email.split('@')[0],
+        email: userInfo.email,
+        googleId: userInfo.id,
+        password: hashedPassword
+      });
+      
+      await user.save();
+      console.log('New user created');
+    } else {
+      console.log('User already exists');
+      // Update googleId if not already set
+      if (!user.googleId) {
+        user.googleId = userInfo.id;
+        await user.save();
+        console.log('Updated user with Google ID');
+      }
+    }
+    
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
+    
+    // Check if FRONTEND_URL exists
+    if (!process.env.FRONTEND_URL) {
+      console.error('FRONTEND_URL environment variable is not set!');
+      return res.status(500).send('Server configuration error: FRONTEND_URL not set');
+    }
+    
+    // Construct and verify redirect URL before redirecting
+    const redirectUrl = `${process.env.FRONTEND_URL}/auth-callback?token=${token}&userId=${user._id}&name=${encodeURIComponent(user.name || '')}&email=${encodeURIComponent(user.email || '')}`;
+    console.log('Redirecting to:', redirectUrl);
+    
+    // Add fallback handling in case of redirect error
+    try {
+      return res.redirect(redirectUrl);
+    } catch (redirectError) {
+      console.error('Redirect error:', redirectError);
+      return res.status(200).send(`
+        <html>
+          <head><title>Authentication Successful</title></head>
+          <body>
+            <h1>Authentication Successful</h1>
+            <p>Redirecting to application...</p>
+            <script>
+              window.location.href = "${redirectUrl.replace(/"/g, '\\"')}";
+            </script>
+          </body>
+        </html>
+      `);
+    }
+    
+  } catch (error) {
+    console.error('Error in Google callback:', error);
+    // Send more detailed error information
+    if (error instanceof Error) {
+      console.error('Error details:', error.message);
+    }
+    
+    // Add environment validation to error response
+    console.log('Environment check - FRONTEND_URL:', process.env.FRONTEND_URL ? 'set' : 'missing');
+    console.log('Environment check - API_URL:', process.env.API_URL ? 'set' : 'missing');
+    
+    // Provide more helpful error response
+    if (!process.env.FRONTEND_URL) {
+      return res.status(500).send('Server configuration error: FRONTEND_URL not set');
+    }
+    
+    return res.redirect(`${process.env.FRONTEND_URL}/login?error=google_auth_failed&reason=${encodeURIComponent('See server logs for details')}`);
+  }
 });
 
 // Add this route to handle Google token verification
